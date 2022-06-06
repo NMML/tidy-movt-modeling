@@ -2,4 +2,54 @@
 title: "Welcome to Tidy Movement Modeling with R"
 ---
 
-This is a Quarto website
+## A Pragmatic Guide 
+
+The `crawl` package for R (and supporting friends e.g. `pathroutr`, `momentuHMM`) is 
+designed and built with the idea that it should be 
+accessible and useful to a research biologist with some intermediate R
+skills and an understanding of the basic statistical theory behind 
+the analysis of animal movement. This website will focus on 
+providing the user with suggested principles, workflows, and pragmatic
+approaches that, if followed, should make analysis with `crawl` more
+efficient and reliable.
+
+> Telemetry data are collected on a wide range of species and come in a number
+> of formats and data structures. The code and examples provided here were
+> developed from data the authors are most familiar with. You will very 
+> likely **NOT** be able to just copy and paste the code and apply to your data.
+> We suggest you focus more on understanding what the code is doing and then
+> write your own version of the code to meet your data and your research needs.
+
+## Content Outline
+
+Information on this site is organized into the following sections:
+
+1. Welcome
+    - introduction to the website (this page)
+    - about the authors
+    - package dependencies
+3. Telemetry Data is Messy
+    - data sources
+    - why tidy telemetry data
+    - tidying messy data for easy modeling
+5. Data Exploration
+    - deployment summary tables
+    - mapping telemetry observations
+    - exploring animal behavior
+7. Movement Modeling with `crawl`
+    - introduction to key concepts
+    - history of `crawl` and mov't models in R
+    - preparing model inputs
+    - easier `crawl`-ing with `crawlUtils`
+    - troubleshooting common errors
+9. Oh No! Paths Cross Land!
+    - routing marine animal paths around land
+    - introduction to the `pathroutr` package
+    - sourcing a land/barrier polygon
+    - `pathroutr` harbor seal example
+    - cautions when using `pathroutr`
+
+If you've never been here before, you are encouraged to work through the
+content on this site in order. Once  you have an understanding of the
+concepts and workflows presented, we hope this site can serve as a reference
+you can revisit when you forget a step or get stuck in your process.
