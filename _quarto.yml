@@ -5,7 +5,7 @@ project:
 website:
   title: "Tidy Movement Modeling with R"
   sidebar:
-    style: "docked"
+    style: "floating"
     search: true
     contents:
       - section: "Welcome"
