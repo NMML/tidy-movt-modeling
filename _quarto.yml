@@ -1,0 +1,47 @@
+project:
+  type: website
+
+website:
+  title: "Tidy Movement Modeling with R"
+  sidebar:
+    style: "docked"
+    search: true
+    contents:
+      - section: "Welcome"
+        contents:
+          - index.qmd
+          - about-authors.qmd
+          - packages.qmd
+      - section: "Telemetry Data is Messy"
+        contents:
+          - data-sources.qmd
+          - why-tidy.qmd
+          - tidy-messy-data.qmd
+      - section: "Data Exploration"
+        contents:
+          - summary-tables.qmd
+          - map-observations.qmd
+          - behavior-plots.qmd
+      - section: "Movement Modeling"
+        contents:
+          - key-concepts.qmd
+          - history-of-crawl.qmd
+          - input-data.qmd
+          - crawl-utils.qmd
+          - troubleshoot.qmd
+      - section: "Oh No! Paths Cross Land!"
+        contents:
+          - path-routing-history.qmd
+          - intro-to-pathroutr.qmd
+          - land-polygon.qmd
+          - pathroutr-demo.qmd
+          - pathroutr-cautions.qmd
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+
+
