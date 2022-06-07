@@ -2,4 +2,16 @@
 title: "About the Authors"
 ---
 
-This is a Quarto website
+## About the Authors {-}
+
+Drs. Josh M. London and Devin S. Johnson are researchers with the NOAA 
+National Marine Fisheries Service. Dr. London is a wildlife biologist at
+the Alaska Fisheries Science Center's Marine Mammal Laboratory in Seattle, Washington. 
+Dr. Johnson is a mathematical statistician at the Pacific Islands Fisheries
+Science Center's Protected Species Division in Honolulu, Hawaii. Dr. London has over
+15 years of experience programming and deploying satellite tags on phocid seals. 
+He has also developed various workflows for the management of telemetry data in R. 
+Dr. Johnson is a leading bio-metrician with expertise in the analysis of animal
+movement. Dr. Johnson is the lead author and developer of the R package `crawl`.
+Dr. London is the lead author of the R package `pathroutr` and co-developer of
+`crawl`.
