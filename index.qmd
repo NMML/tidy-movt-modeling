@@ -2,6 +2,24 @@
 title: "Welcome to Tidy Movement Modeling with R"
 ---
 
+## Preface
+
+Over the years, we have produced a number of online resources intended
+to provide insights and examples for modeling animal movement with the `crawl`
+and `pathroutr` packages. Some of these documents and examples have aged well;
+others have not. R, the tidyverse, animal movement theory, and our 
+experience evolve quickly. What we might have proposed as the best approach
+5 years ago (or, sometimes even 5 months ago) may not be the case today.
+
+This website is being developed to provide a more authoritative resource that we 
+hope to maintain more reliably than previous attempts. The bio-logging and 
+animal movement modeling community can also play a role by helping us improve
+the content. Identification of errors and suggested improvements are strongly 
+encouraged. If you find an error or have ideas for improvement, please open
+an [issue via the GitHub repository](https://github.com/NMML/tidy-movt-modeling/issues).
+We will also accept pull requests for any bug fixes or enhancements.
+
+
 ## A Pragmatic Guide 
 
 The `crawl` package for R (and supporting friends e.g. `pathroutr`, `momentuHMM`) is 
@@ -53,3 +71,78 @@ If you've never been here before, you are encouraged to work through the
 content on this site in order. Once  you have an understanding of the
 concepts and workflows presented, we hope this site can serve as a reference
 you can revisit when you forget a step or get stuck in your process.
+
+## Analysis and Coding Principles
+
+As with anything in science and R, there are a number of right ways to approach
+a problem. The workflows and principles outlined here aren't the only way to
+develop animal movement models in R. However, this content has been developed
+after years of working with researchers and troubleshooting common issues. For
+most users, following this guide will prove a successful endeavor. More advanced
+users or those with specific needs should feel free to refer to this as a
+starting point but then expand to meet their need.
+
+### Source Data are Read Only
+
+Source data should not be edited. In many cases, the financial and personal
+investment required to obtain these data is significant. In addition, the
+unique timing, location, and nature of the data cannot be replicated so every
+effort should be employed to preserve the integrity of source data as they
+were collected. All efforts should be made to also insure that source data
+are stored in plain text or well described open formats. This approach provides
+researchers confidence that data will be available and usable well into the
+future.
+
+### Script Everything
+
+In all likelihood, the format of any source data will not be conducive to 
+established analytical procedures. For example, `crawl` cannot accept a raw
+data file downloaded from ArgosWeb or the Wildlife Computers Data Portal. Some
+amount of data processing is required. Keeping with the principles of
+reproducibility, all data assembly and pipelines should be scripted. Here, we
+rely on the R programming language for our scripts, but Python or other
+similar languages will also meet this need. 
+
+### Document Along the Way
+
+Scripting the data assembly should be combined with an effort to properly
+document the process. Documentation is an important component of reproducibility
+and, if done as part of the scripting and development process, provides an
+easier workflow for publishing results and data to journals and repositories.
+The `rmarkdown`, `bookdown`, and `quarto` packages provide an excellent 
+framework for combining your scripts with documentation. This entire 
+website is written with `quarto` and `knitr`.
+
+### Embrace the Tidyverse
+
+The _tidyverse_ describes a set of R packages developed around core principles
+of tidy data. Tidy data principles are outlined in a 2014 
+[paper](http://dx.doi.org/10.18637/jss.v059.i10) published in the 
+_Journal of Statistical Software_. The key tenants of tidy data are:
+
+1. Each variable forms a column.
+2. Each observation forms a row.
+3. Each type of observational unit forms a table.
+
+Location data from telemetry deployments often follows this type of structure ---
+each location estimate is a row and the columns all represent variable
+attributes associated with that location. Additionally, the location data
+are usually organized into a single table. Behavior data, however, often
+comes in a less structured format. Different behavior type data are sometimes
+mixed within a single table and column headings do not consistently describe
+the same variable (e.g. _Bin1_, _Bin2_, etc). There are valid reasons for
+tag vendors and data providers to transmit the source data in this way, but the
+structure is not conducive to analysis.
+
+The `tidyverse` package is a wrapper for a number of separate packages that each
+contribute to the tidy'ing of data. The `tidyr`, `dplyr`, `readr`, and `purrr`
+packages are key components. In addition, the `lubridate` package (not included
+in the `tidyverse` package) is especially useful for consistent manipulation
+of date-time values. More information and documentation for the packages can be
+found at the [tidyverse.org](http://tidyverse.org) website.
+
+### Anticipate Errors & Trap Them
+
+Use R's error trapping functions (`try()` and `tryCatch()`) in areas of your
+code where you anticipate parsing errors or potential issues with convergence
+or fit. The `purrr::safely()` function also provides a great service.
