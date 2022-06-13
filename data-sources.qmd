@@ -30,7 +30,7 @@ is presented is not applicable to other bio-logging data sources. When
 possible, we've tried to create examples and processes that are agnostic to
 the type of deployed device.
 
-:::{.callout-tip}
+:::{.callout-tip appearance="minimal"}
 ## The `wcUtils` Package
 
 Frequent users of the Wildlife Computers Data Portal or data from their

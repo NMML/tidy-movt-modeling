@@ -31,12 +31,14 @@ providing the user with suggested principles, workflows, and pragmatic
 approaches that, if followed, should make analysis with `crawl` more
 efficient and reliable.
 
-> Telemetry data are collected on a wide range of species and come in a number
-> of formats and data structures. The code and examples provided here were
-> developed from data the authors are most familiar with. You will very 
-> likely **NOT** be able to just copy and paste the code and apply to your data.
-> We suggest you focus more on understanding what the code is doing and then
-> write your own version of the code to meet your data and your research needs.
+:::{.callout-note appearance="minimal"}
+Telemetry data are collected on a wide range of species and come in a number
+of formats and data structures. The code and examples provided here were
+developed from data the authors are most familiar with. You will very 
+likely **NOT** be able to just copy and paste the code and apply to your data.
+We suggest you focus more on understanding what the code is doing and then
+write your own version of the code to meet your data and your research needs.
+:::
 
 ## Content Outline
 
