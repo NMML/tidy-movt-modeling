@@ -2,4 +2,40 @@
 title: "Data Sources"
 ---
 
-This is a Quarto website
+## Assembling Source Data
+
+Where and how you access the source data for your telemetry study will depend
+on the type of tag and vendor. Argos location data is available to users from the 
+Argos website and many third party sites and repositories (e.g. movebank, 
+sea-turtle.org) have API connections to ArgosWeb that can facilitate data access.
+Each tag manufacturer often has additional data streams included within the
+Argos transmission that require specific software or processing to translate.
+Both the Sea Mammal Research Unit (SMRU) and Wildlife Computers provide online
+data portals that provide users access to the location and additional sensor
+data.
+
+Regardless of how the data are retrieved, these files should be treated as read
+only and not edited. ArgosWeb and vendors have, typically, kept the data formats
+and structure consistent over time. This affords end users the ability to develop
+custom processing scripts without much fear the formats will change and break
+their scripts.
+
+## Wildlife Computers Data Sources
+
+We have the most first-hand experience with data originating from Wildlife
+Computers devices and data that have been processed through the Wildlife
+Computers Data Portal. This doesn't mean the techniques, packages, and
+analysis presented require Wildlife Computers devices. Or, that most of what
+is presented is not applicable to other bio-logging data sources. When
+possible, we've tried to create examples and processes that are agnostic to
+the type of deployed device.
+
+:::{.callout-tip}
+## The `wcUtils` Package
+
+Frequent users of the Wildlife Computers Data Portal or data from their
+bio-loggers processed through the DAP program may find the `wcutils` package
+for R useful. This package is maintained by Josh London and provides several
+utility function for downloading data from the WCDP and for tidy processing
+of typical data files.
+:::
