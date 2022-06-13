@@ -20,6 +20,18 @@ and structure consistent over time. This affords end users the ability to develo
 custom processing scripts without much fear the formats will change and break
 their scripts.
 
+## Data Management
+
+The quantity and diversity of data generated from bio-logging studies can
+quickly become overwhelming especially in situations where a single device
+is deployed for several months and collects data from multiple on-board
+sensors. For some research projects, storing these data in a central
+relational database (e.g. PostgreSQL, SQLite) can have important benefits. If
+storing bio-logger data in a relational database, explore one that provides
+native support or extensions for spatial data types and operations (e.g. PostGIS,
+SpatiaLite). For many, though, simply storing data as and organized collection
+of plain text files (e.g. *.csv) is sufficient. 
+
 ## Wildlife Computers Data Sources
 
 We have the most first-hand experience with data originating from Wildlife
