@@ -143,6 +143,11 @@ in the `tidyverse` package) is especially useful for consistent manipulation
 of date-time values. More information and documentation for the packages can be
 found at the [tidyverse.org](http://tidyverse.org) website.
 
+Please note, however, that use of the _tidyverse_ packages are **not** a
+requirement or indication of _tidy data principles_. So called, _base R_ and
+other approaches in the R community can support tidy data and extensive
+use of _tidyverse_ packages can also result in very un-tidy data.
+
 ### Anticipate Errors & Trap Them
 
 Use R's error trapping functions (`try()` and `tryCatch()`) in areas of your
