@@ -1,5 +1,147 @@
 ---
-title: "Package Dependencies"
+title: "Package Installation & Dependencies"
 ---
 
-This is a Quarto website
+## Update Your Version of R
+
+The examples and workflows described here are all developed with **R version 4.2**
+and you are strongly encouraged to update your version to 4.2 _or greater_. In
+general, the code and examples provided should work reliably with any version
+of R greater than 4.0.
+
+## Install Core Packages
+
+The focus of this site, and the example workflows we describe, is on animal
+movement modeling in R using the `{crawl}` package. In addition, the recently
+developed `{pathroutr}` and `{crawlUtils}` packages are key enhancements that
+extend the capabilities of `{crawl}` and improve the user experience.
+
+You are strongly encouraged to install the latest available versions of each
+package.
+
+### Install `{crawl}`
+
+#### Install via CRAN
+
+`{crawl}` is currently available on CRAN and R >= 4.0 is highly recommended. 
+
+```{r, eval = FALSE}
+# install latest version of crawl from CRAN
+install.packages("crawl")
+```
+
+
+#### Install via R-Universe
+
+The latest version of `{crawl}` is also available via R-Universe.
+
+```{r, eval = FALSE}
+# Install crawl from my R-Universe repository
+# Enable repository from dsjohnson
+options(repos = c(
+  dsjohnson = 'https://dsjohnson.r-universe.dev',
+  CRAN = 'https://cloud.r-project.org'))
+# Download and install crawl in R
+install.packages('crawl')
+# Browse the crawl manual pages
+help(package = 'crawl')
+```
+
+You can also add the repository to your local list of repositories in your
+*.Rprofile* and this will ensure `update.packages()` pulls any new releases
+of `{crawl}` from R-Universe
+
+```{r, eval = FALSE}
+#install.packages("usethis")
+usethis::edit_r_profile()
+# add the following text or replace existing repos option
+options(repos = c(dsjohnson = 'https://dsjohnson.r-universe.dev',
+                  CRAN = 'https://cloud.r-project.org'))
+```
+
+#### Install via Github
+
+A development version  of `{pathroutr}` is also available from
+[GitHub](https://github.com/NMML/crawl). This version should be used with 
+caution and only after consulting with package authors.
+
+```{r, eval = FALSE}
+# install.packages("remotes")
+remotes::install_github("NMML/crawl@devel")
+```
+
+
+### Install `{pathroutr}`
+
+`{pathroutr}` is currently not available on CRAN and also requires R >= 4.0. Please 
+upgrade your version of R, if needed, before proceeding. Future versions of 
+`{pathroutr}` may support pre-4.0 versions of R. But, for now, only 4.0+ is supported.
+
+#### Install via R-Universe
+
+Starting with v0.2.1, `{pathroutr}` is available via R-Universe.
+
+```{r, eval = FALSE}
+# Install new pathroutr version from my R-Universe repository
+install.packages("pathroutr", repos = "https://jmlondon.r-universe.dev")
+```
+
+You can also add my repository to your local list of repositories in your
+*.Rprofile* and this will ensure `update.packages()` pulls any new releases
+of `{pathroutr}`
+
+```{r, eval = FALSE}
+#install.packages("usethis")
+usethis::edit_r_profile()
+# add the following text or replace existing repos option
+options(repos = c(jmlondon = 'https://jmlondon.r-universe.dev',
+                  CRAN = 'https://cloud.r-project.org'))
+```
+
+#### Install via Github
+
+The development version  of `{pathroutr}` is available from
+[GitHub](https://github.com/jmlondon/pathroutr) with:
+
+```{r, eval = FALSE}
+# install.packages("remotes")
+remotes::install_github("jmlondon/pathroutr")
+```
+
+
+### Install `{crawlUtils}`
+
+#### Install via R-Universe
+
+```{r, eval = FALSE}
+# Install crawlUtils from Devin's R-Universe repository
+options(repos = c(
+  dsjohnson = 'https://dsjohnson.r-universe.dev',
+  CRAN = 'https://cloud.r-project.org'))
+# Download and install crawlUtils in R
+install.packages('crawlUtils')
+# Browse the crawlUtils manual pages
+help(package = 'crawlUtils')
+```
+
+You can also add the repository to your local list of repositories in your
+*.Rprofile* and this will ensure `update.packages()` pulls any new releases
+of `{crawlUtils}` from R-Universe
+
+```{r, eval = FALSE}
+#install.packages("usethis")
+usethis::edit_r_profile()
+# add the following text or replace existing repos option
+options(repos = c(dsjohnson = 'https://dsjohnson.r-universe.dev',
+                  CRAN = 'https://cloud.r-project.org'))
+```
+
+#### Install via Github
+
+The development version  of `{crawlUtils}` is available from
+[GitHub](https://github.com/dsjohnson/crawlUtils) with:
+
+```{r, eval = FALSE}
+# install.packages("remotes")
+remotes::install_github("dsjohnson/crawlUtils")
+```
