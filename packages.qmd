@@ -1,5 +1,7 @@
 ---
 title: "Package Installation & Dependencies"
+execute:
+  eval: false
 ---
 
 ## Update Your Version of R
@@ -25,7 +27,7 @@ package.
 
 `{crawl}` is currently available on CRAN and R >= 4.0 is highly recommended. 
 
-```{r, eval = FALSE}
+```{r}
 # install latest version of crawl from CRAN
 install.packages("crawl")
 ```
@@ -35,7 +37,7 @@ install.packages("crawl")
 
 The latest version of `{crawl}` is also available via R-Universe.
 
-```{r, eval = FALSE}
+```{r}
 # Install crawl from my R-Universe repository
 # Enable repository from dsjohnson
 options(repos = c(
@@ -51,7 +53,7 @@ You can also add the repository to your local list of repositories in your
 *.Rprofile* and this will ensure `update.packages()` pulls any new releases
 of `{crawl}` from R-Universe
 
-```{r, eval = FALSE}
+```{r}
 #install.packages("usethis")
 usethis::edit_r_profile()
 # add the following text or replace existing repos option
@@ -65,7 +67,7 @@ A development version  of `{pathroutr}` is also available from
 [GitHub](https://github.com/NMML/crawl). This version should be used with 
 caution and only after consulting with package authors.
 
-```{r, eval = FALSE}
+```{r}
 # install.packages("remotes")
 remotes::install_github("NMML/crawl@devel")
 ```
@@ -81,7 +83,7 @@ upgrade your version of R, if needed, before proceeding. Future versions of
 
 Starting with v0.2.1, `{pathroutr}` is available via R-Universe.
 
-```{r, eval = FALSE}
+```{r}
 # Install new pathroutr version from my R-Universe repository
 install.packages("pathroutr", repos = "https://jmlondon.r-universe.dev")
 ```
@@ -90,7 +92,7 @@ You can also add my repository to your local list of repositories in your
 *.Rprofile* and this will ensure `update.packages()` pulls any new releases
 of `{pathroutr}`
 
-```{r, eval = FALSE}
+```{r}
 #install.packages("usethis")
 usethis::edit_r_profile()
 # add the following text or replace existing repos option
@@ -103,7 +105,7 @@ options(repos = c(jmlondon = 'https://jmlondon.r-universe.dev',
 The development version  of `{pathroutr}` is available from
 [GitHub](https://github.com/jmlondon/pathroutr) with:
 
-```{r, eval = FALSE}
+```{r}
 # install.packages("remotes")
 remotes::install_github("jmlondon/pathroutr")
 ```
@@ -113,7 +115,7 @@ remotes::install_github("jmlondon/pathroutr")
 
 #### Install via R-Universe
 
-```{r, eval = FALSE}
+```{r}
 # Install crawlUtils from Devin's R-Universe repository
 options(repos = c(
   dsjohnson = 'https://dsjohnson.r-universe.dev',
@@ -128,7 +130,7 @@ You can also add the repository to your local list of repositories in your
 *.Rprofile* and this will ensure `update.packages()` pulls any new releases
 of `{crawlUtils}` from R-Universe
 
-```{r, eval = FALSE}
+```{r}
 #install.packages("usethis")
 usethis::edit_r_profile()
 # add the following text or replace existing repos option
@@ -141,7 +143,7 @@ options(repos = c(dsjohnson = 'https://dsjohnson.r-universe.dev',
 The development version  of `{crawlUtils}` is available from
 [GitHub](https://github.com/dsjohnson/crawlUtils) with:
 
-```{r, eval = FALSE}
+```{r}
 # install.packages("remotes")
 remotes::install_github("dsjohnson/crawlUtils")
 ```
