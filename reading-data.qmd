@@ -1,0 +1,298 @@
+---
+title: "Reading Source data"
+---
+
+## Read In CSV Source Data
+
+Our first step will be to read our source data into R. For this example,
+we'll be using data for six bearded seal deployments of the northwest coast of
+Alaska. The data were downloaded as comma-separated files from the
+Wildlife Computers Data Portal. All data have merged into a single _csv_ file
+and grouped by a 'DeployID' unique identifier. The
+`raw-data/akbs_locs.csv` contains all of the Argos location estimates determined for
+each deployment as well as fastloc GPS location estimates when available. 
+At a minimum, this file includes identifying columns such as
+`DeployID`, `PTT`, `Date`, `Quality`, `Type`, `Latitude`, and `Longitude`. If
+the Argos Kalman filtering approach has been enabled (which it should be for any
+modern tag deployment), then additional data will be found in columns that
+describe the error ellipses (e.g. `Error Semi-major axis`, `Error Semi-minor
+axis`, `Error Ellipse orientation`). Note, if the tag transmitted GPS/FastLoc
+data, this file will list those records as `Type = 'FastGPS'`.
+
+In many situations, the original source data may include multiple _*.csv_ or
+other delimited files. Instead of reading each file in one by one, the
+`purr::map_df()` function can be used to cycle through each _*.csv_ files in
+a directory and pass them to `readr::read_csv()` and, then, return a merged
+tibble/data.frame. This was the original case for these Alaska bearded seal
+data and the following code was used to create the combined _*.csv_ file from
+several _*-Locations.csv_ files.
+
+```{r}
+#| eval: false
+library(dplyr)
+library(readr)
+library(purrr)
+library(here)
+
+my_cols <- cols(
+  DeployID = col_character(),
+  Ptt = col_integer(),
+  Instr = col_character(),
+  Date = col_datetime("%H:%M:%S %d-%b-%Y"),
+  Type = col_character(),
+  Quality = col_character(),
+  Latitude = col_double(),
+  Longitude = col_double(),
+  `Error radius` = col_integer(),
+  `Error Semi-major axis` = col_integer(),
+  `Error Semi-minor axis` = col_integer(),
+  `Error Ellipse orientation` = col_integer(),
+  Offset = col_character(),
+  `Offset orientation` = col_character(),
+  `GPE MSD` = col_character(),
+  `GPE U` = col_character(),
+  Count = col_character(),
+  Comment = col_character()
+)
+
+tbl_locs <- list.files(file.path('~/Downloads/akbs_data'),
+                       recursive = TRUE, 
+                       full.names = TRUE, 
+                       pattern = "*-Locations.csv") %>% 
+  purrr::map_df( ~ readr::read_csv(.x, col_types = my_cols)) %>% 
+  readr::write_csv(file = here::here('raw-data','akbs_locs.csv'))
+```
+
+The `readr` package includes the `read_csv()` function which we will rely on to read
+the csv data into R. This function is very similar to `read.csv()` but provides
+some additional functionality and consistency. One important step is to 
+specify the column types for each column in the data set. This saves an additional
+step post-read where we have to mutate each column type. Note, we also rely on
+the `here` package for reliable and consistent file paths. Lastly, the
+`janitor::clean_names()` function is used to provide a consistent transformation
+of column names (e.g. lower and snake case with no spaces).
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+library(dplyr)
+library(readr)
+library(here)
+library(janitor)
+
+my_cols <- cols(
+  DeployID = col_character(),
+  Ptt = col_integer(),
+  Instr = col_character(),
+  Date = col_datetime("%H:%M:%S %d-%b-%Y"),
+  Type = col_character(),
+  Quality = col_character(),
+  Latitude = col_double(),
+  Longitude = col_double(),
+  `Error radius` = col_integer(),
+  `Error Semi-major axis` = col_integer(),
+  `Error Semi-minor axis` = col_integer(),
+  `Error Ellipse orientation` = col_integer(),
+  Offset = col_character(),
+  `Offset orientation` = col_character(),
+  `GPE MSD` = col_character(),
+  `GPE U` = col_character(),
+  Count = col_character(),
+  Comment = col_character()
+)
+path_to_file <- here::here("raw-data","akbs_locs.csv")
+akbs_locs <- readr::read_csv(path_to_file) %>% 
+  janitor::clean_names()
+```
+
+## Efficient Data Storage with Arrow
+
+As previously mentioned, thoughtful data management is an important component
+of any movement modeling analysis. For some, a central relational database
+(e.g., PostgreSQL) will be a good solution. However, in many cases, an
+organized collection of _*.csv_ files or an in-memory database solution
+(e.g. SQLite, DuckDb) will be a good option. For this example, we're going
+to rely on the Apache `arrow` package for R and a collection of `parquet`
+files as our efficient data source. 
+
+```{r}
+#| warning: false
+#| message: false
+library(arrow)
+library(fs)
+dir_out <- here::here("data","akbs_locs_parquet")
+fs::dir_delete(dir_out)
+fs::dir_create(dir_out)
+arrow::write_dataset(akbs_locs, dir_out, partitioning = "deploy_id")
+rm(akbs_locs) #remove from memory
+```
+
+If we take a quick look at the director/file structure withing our output
+directory, _data/akbs_locs_parquet_, we can see that `arrow` created a 
+separate subdirectory for each `deploy_id` and there's a separate _*.parquet_
+file within each of those subdirectories
+
+```{r}
+dir_ls(dir_out) %>% path_rel(here::here("data"))
+```
+
+
+```{r}
+dir_ls(dir_out, recurse = TRUE, glob = "*.parquet") %>% 
+  path_rel(here::here("data"))
+```
+
+
+## Querying Our Data
+
+Now that we have our data organized with `arrow` and `parquet` files, we can
+explore ways the data can be queried and used in our analysis. There are two
+approaches and package frameworks we can rely on for querying:
+
+1. The `dplyr` package's support for `arrow`/`parquet`
+2. Direct use of SQL syntax with `duckdb`'s `arrow`/`parquet` integration
+
+### A `dplyr` example
+
+Two common tasks we might want to perform are to calculate the number of
+location records by deployment and to filter our data set based on a particular
+date range.
+
+In this first example we create an open connection with our data set using
+the `arrow::open_dataset()` function and passing our `dir_out` path. Then,
+basic `dplyr` functions can return a table of location counts summarized
+by `deploy_id`. Note, unlike typical `dplyr` usage, the `collect()`
+function is required to actually return the data set records.
+
+```{r}
+#| warning: false
+#| message: false
+# open the dataset
+akbs_ds <- arrow::open_dataset(dir_out) 
+
+# query the dataset to calculate number of locations by deploy_id
+akbs_ds %>% 
+  count(deploy_id, name="n_locs") %>% 
+  arrange(deploy_id) %>% 
+  collect()
+
+```
+
+In this situation, we want to just look at locations from the months of
+August, September, and October. For this, the `month()` function from the
+`lubridate` package provides a way for us to filter by month integer.
+
+```{r}
+#| warning: false
+#| message: false
+# query the data set to only include the months of August, 
+# September, and October
+akbs_ds %>% 
+  filter(month(date) %in% c(8,9,10)) %>% 
+  relocate(deploy_id) %>% 
+  collect()
+```
+
+### A `duckdb` example
+
+DuckDB is a powerful in-process database management system that is easily
+installed as an R package and provides built-in support for our `arrow`/`parquet`
+data. With the `duckdb` package as well as `DBI`, we can pass standard SQL
+code to query our data set. This is especially useful if you are 
+familiar/comfortable with SQL and you want to develop some fairly complex
+queries for your data.
+
+```{r}
+#| message: false
+#| warning: false
+library(duckdb)
+# open connection to DuckDB
+con <- dbConnect(duckdb::duckdb())
+
+# register the data set as a DuckDB table, and give it a name
+duckdb::duckdb_register_arrow(con, "akbs_locs", akbs_ds)
+
+# query
+dbGetQuery(con, 
+           "SELECT deploy_id, COUNT(*) AS n_locs 
+           FROM akbs_locs 
+           GROUP BY deploy_id")
+
+# clean up
+duckdb_unregister(con, "akbs_locs")
+dbDisconnect(con)
+```
+
+## Create Our Location Dataset
+
+We're going to rely on the typical `dplyr` approach to query our source
+data and distill it down to only the essential columns needed for our
+analysis. Also, since we have a combination of Argos and FastGPS data, we need
+to create a separate column for the number of satellites used during the fastloc
+GPS calculation.
+
+```{r}
+#| warning: false
+#| message: false
+akbs_ds <- arrow::open_dataset(dir_out)
+
+akbs_locs <- akbs_ds %>% 
+  dplyr::select(deploy_id,
+                date,
+                type,
+                quality,
+                latitude,
+                longitude,
+                error_semi_major_axis,
+                error_semi_minor_axis,
+                error_ellipse_orientation) %>% 
+  mutate(
+    num_sats = case_when(
+      type == "FastGPS" ~ quality
+      ),
+    quality = case_when(
+      type == "FastGPS" ~ NA
+    ),
+    num_sats = as.integer(num_sats)
+    ) %>% 
+  collect()
+```
+
+## Convert to Spatial Feature
+
+Since our data are, at the core, spatial observations we will benefit by
+converting our `akbs_locs` tibble/data.frame into a spatial point feature
+with the `sf`package. In order to accomplish this, we need to identify our
+coordinate columns and know the coordinate reference system (CRS). For all Argos and
+GPS data, the coordinate reference system is geographic with X and Y 
+represented as longitude (-180, 180) and latitude (-90, 90). You should
+ensure the data are formatted as decimal degrees and not some combination of
+degrees, minutes, and seconds. To specify the CRS, we'll rely on the 
+designated EPSG code of _4326_ which tells `sf` that our data are
+geographic.
+
+```{r}
+#| warning: false
+#| message: false
+library(sf)
+
+akbs_locs <- sf::st_as_sf(akbs_locs, coords = c("longitude","latitude"),
+                          crs = "epsg:4326")
+
+akbs_locs %>% 
+  dplyr::select(deploy_id, date, geometry)
+
+```
+
+We can see that instead of separate columns for `longitude` and `latitude` we
+now have a single `geometry` column that describes the point geometry of each
+location. Also note that the metadata indicates the _Geodetic CRS_ is specified
+as _WGS 84_ which tells is our CRS specification is correctly set to
+geographic with longitude/latitude coordinate values.
+
+```{r}
+#| include: false
+saveRDS(akbs_locs, file = here::here("shared_cache","akbs_locs.rds"))
+```
+

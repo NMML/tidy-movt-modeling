@@ -19,6 +19,7 @@ website:
           - tidy-messy-data.qmd
       - section: "Data Exploration"
         contents:
+          - reading-data.qmd
           - summary-tables.qmd
           - map-observations.qmd
           - behavior-plots.qmd
