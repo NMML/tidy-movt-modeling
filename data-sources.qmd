@@ -26,11 +26,16 @@ The quantity and diversity of data generated from bio-logging studies can
 quickly become overwhelming especially in situations where a single device
 is deployed for several months and collects data from multiple on-board
 sensors. For some research projects, storing these data in a central
-relational database (e.g. PostgreSQL, SQLite) can have important benefits. If
+relational database (e.g. PostgreSQL) can have important benefits. If
 storing bio-logger data in a relational database, explore one that provides
 native support or extensions for spatial data types and operations (e.g. PostGIS,
 SpatiaLite). For many, though, simply storing data as and organized collection
-of plain text files (e.g. *.csv) is sufficient. 
+of plain text files (e.g. *.csv) is sufficient. This approach can be further
+improved by converting the comma-separated files to `parquet` files and leaning
+on the the Apache `arrow` package for R. These `parquet` files provide 
+modern and efficient file compression, a columnar-based structure, and are
+optimized for big data. Even if a project starts as small data, it's often
+useful to design your data management with growth in mind.
 
 ## Wildlife Computers Data Sources
 
