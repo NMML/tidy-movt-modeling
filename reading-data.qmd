@@ -214,14 +214,16 @@ con <- dbConnect(duckdb::duckdb())
 duckdb::duckdb_register_arrow(con, "akbs_locs", akbs_ds)
 
 # query
-dbGetQuery(con, 
+res <- dbGetQuery(con, 
            "SELECT deploy_id, COUNT(*) AS n_locs 
            FROM akbs_locs 
            GROUP BY deploy_id")
 
 # clean up
 duckdb_unregister(con, "akbs_locs")
-dbDisconnect(con)
+dbDisconnect(con, shutdown = TRUE)
+
+tibble(res)
 ```
 
 An example of a more complex SQL query that might be of interest is to identify
@@ -238,7 +240,7 @@ con <- dbConnect(duckdb::duckdb())
 duckdb::duckdb_register_arrow(con, "akbs_locs", akbs_ds)
 
 # query
-dbGetQuery(con, 
+res <- dbGetQuery(con, 
            "SELECT a.deploy_id, a.date, a.quality,
            a.latitude, a.longitude, a.error_radius
             FROM akbs_locs a
@@ -252,7 +254,9 @@ ORDER BY a.deploy_id, a.date")
 
 # clean up
 duckdb_unregister(con, "akbs_locs")
-dbDisconnect(con)
+dbDisconnect(con, shutdown = TRUE)
+
+tibble(res)
 ```
 
 If we look at the above table, we can see the duplicate `date` column values
@@ -267,7 +271,7 @@ con <- dbConnect(duckdb::duckdb())
 duckdb::duckdb_register_arrow(con, "akbs_locs", akbs_ds)
 
 # query
-dbGetQuery(con,
+res <- dbGetQuery(con,
            "select a.*
             from
             (select *
@@ -280,7 +284,9 @@ dbGetQuery(con,
 
 # clean up
 duckdb_unregister(con, "akbs_locs")
-dbDisconnect(con)
+dbDisconnect(con, shutdown = TRUE)
+
+tibble(res)
 ```
 
 
