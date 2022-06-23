@@ -10,7 +10,7 @@ name: Render and deploy website
 
 jobs:
   build-deploy:
-    runs-on: ubuntu-latest
+    runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
 
@@ -19,10 +19,6 @@ jobs:
         # uncomment and fill to pin a version
         # with:
         #   version: 0.9.105
-        
-      - name: Install libcurl and libudunits on Linux
-        if: runner.os == 'Linux'
-        run: sudo apt-get update -y && sudo apt-get install -y libcurl4-openssl-dev libudunits2-dev
         
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -35,7 +31,7 @@ jobs:
 
       - uses: r-lib/actions/setup-renv@v2
         with:
-          cache-version: 2
+          cache-version: 1
       
       - name: Render book to all format
         # Add any command line argument needed
