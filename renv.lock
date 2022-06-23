@@ -1109,10 +1109,10 @@
     },
     "terra": {
       "Package": "terra",
-      "Version": "1.5-34",
+      "Version": "1.5-21",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "c3401c4598d3c2d6158e10c966d70cbd",
+      "Hash": "a713f0d9f9a2b68af112a991adbfe5d5",
       "Requirements": [
         "Rcpp"
       ]
