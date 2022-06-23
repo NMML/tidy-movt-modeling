@@ -21,6 +21,7 @@ website:
         contents:
           - reading-data.qmd
           - summary-tables.qmd
+          - outlier-locs.qmd
           - map-observations.qmd
           - behavior-plots.qmd
       - section: "Movement Modeling"

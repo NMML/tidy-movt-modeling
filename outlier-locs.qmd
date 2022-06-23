@@ -1,0 +1,49 @@
+---
+title: "Removing Outlier Locations"
+---
+
+```{r}
+#| include: false
+akbs_locs <- readRDS(here::here("shared_cache","akbs_locs.rds"))
+```
+
+## Filtering Obviously Wrong Locations
+
+Location estimates from bio-loggers can sometimes provide extremely
+erroneous locations. This is especially true for the Argos system and the error
+estimates provided do not provide a realistic mechanism for removal (e.g.
+remove all locations with an error estimate above some threshold). If these
+extreme outliers are not removed from the data set prior to model fitting,
+issues with model convergence or other errors can arise.
+
+## Speed, Distance, and Angle Filtering
+
+To identify and remove these obviously erroneous observations we will rely
+on a speed, distance, and angle filter from the `trip` package to identify locations
+that would require traveling speeds that exceed 3x or more what would be 
+expected from the study species. In our case, with bearded seals, we'll
+use 7.5m/second (the likely maximum sustained speed for a bearded seal is
+2.5m/second).
+
+```{r}
+#| message: false
+#| warning: false
+library(dplyr)
+library(sf)
+library(trip)
+
+dat <- akbs_locs %>% 
+  group_by(deploy_id)
+
+dat_tr <- trip(dat, c("date","deploy_id"), correct_all = FALSE)
+
+tmp <-
+      suppressWarnings(try(
+        sda(
+          dat_tr,
+          smax = 7.5
+        ),
+      silent = TRUE)
+      )
+```
+
