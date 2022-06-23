@@ -20,7 +20,7 @@ issues with model convergence or other errors can arise.
 
 To identify and remove these obviously erroneous observations we will rely
 on a speed, distance, and angle filter from the `trip` package to identify locations
-that would require traveling speeds that exceed 3x or more what would be 
+that would require traveling speeds that exceed 2x or more what would be 
 expected from the study species. In our case, with bearded seals, we'll
 use 7.5m/second (the likely maximum sustained speed for a bearded seal is
 2.5m/second).
@@ -33,17 +33,17 @@ library(sf)
 library(trip)
 
 dat <- akbs_locs %>% 
-  group_by(deploy_id)
+  ungroup() %>% 
+  arrange(deploy_id, date)
 
 dat_tr <- trip(dat, c("date","deploy_id"), correct_all = FALSE)
 
 keep <- sda(
           dat_tr,
-          smax = 7.5
+          smax = 27 #km/hour or 7.5m/sec *3.6
         )
 
-akbs_locs <- akbs_locs %>% 
-  ungroup() %>% 
+akbs_locs <- dat %>% 
   mutate(sda_keep = keep) %>% 
   filter(sda_keep) %>% 
   dplyr::select(-sda_keep)
