@@ -2,4 +2,86 @@
 title: "Deployment Summary Tables"
 ---
 
-This is a Quarto website
+## Understanding Our Source Data
+
+Now that we've setup a data structure for efficient access, imported the
+source data into R, and converted that data into a spatial data set, it's
+time to explore and see what we have to work with. This is an important step so
+you can recognize any problems with the data or inconsistencies that need to be
+further investigated.
+
+Summary tables are a good way of splitting large data into components of 
+interest and learning how our data might be distributed across those
+components. One example might be a simple calculation of the number of
+location observations within each month across the individual animals. This
+might identify anomalies such as locations in months prior to deployment or
+missing data when it was expected.
+
+```{r}
+#| include: false
+akbs_locs <- readRDS(here::here("shared_cache","akbs_locs.rds"))
+```
+
+We'll first want to group our location records by deployment and month.
+
+```{r}
+#| warning: false
+#| message: false
+library(sf)
+library(lubridate)
+library(dplyr)
+
+dat <- akbs_locs %>% 
+  sf::st_drop_geometry() %>% 
+  mutate(month = lubridate::month(date)) %>% 
+  group_by(deploy_id, month) %>% 
+  count(name = "num_locs") 
+```
+
+To create a sensible table, let's just focus on a single _deploy_id_,
+_EB2009_3000_06A1346_
+
+```{r}
+#| warning: false
+#| message: false
+library(knitr)
+
+dat %>% 
+  dplyr::filter(deploy_id == "EB2009_3000_06A1346") %>% 
+  dplyr::arrange(month) %>% 
+  knitr::kable()
+```
+
+One oddity that immediately stands out is the lack of locations in May.
+This, however, is to be expected as these deployments started in June
+and stopped transmitting in April of the following year and matches
+expectations for battery life.
+
+If we look at another deployment, _EB2009_3001_06A1332_, we can see
+that this deployment ended in March.
+
+```{r}
+#| warning: false
+#| message: false
+dat %>% 
+  dplyr::filter(deploy_id == "EB2009_3001_06A1332") %>% 
+  dplyr::arrange(month) %>% 
+  knitr::kable()
+```
+
+Lastly, deployment _EB2011_3001_10A0552_ appears to have stopped
+transmitting in January of the following year which is 3-4 months
+earlier than any of the other devices. 
+
+```{r}
+#| warning: false
+#| message: false
+dat %>% 
+  dplyr::filter(deploy_id == "EB2011_3001_10A0552") %>% 
+  dplyr::arrange(month) %>% 
+  knitr::kable()
+```
+
+This is not so unusual, but such an anomaly is worth investigating
+further to ensure there were no issues with the data processing or
+other important deployment metadata.
