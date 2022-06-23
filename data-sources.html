@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-0.9.583">
+<meta name="generator" content="quarto-0.9.613">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -148,6 +148,11 @@ ul.task-list{list-style: none;}
     <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./reading-data.html" class="sidebar-item-text sidebar-link">Reading Source data</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./summary-tables.html" class="sidebar-item-text sidebar-link">Deployment Summary Tables</a>
   </div>
 </li>
@@ -274,7 +279,7 @@ ul.task-list{list-style: none;}
 </section>
 <section id="data-management" class="level2">
 <h2 class="anchored" data-anchor-id="data-management">Data Management</h2>
-<p>The quantity and diversity of data generated from bio-logging studies can quickly become overwhelming especially in situations where a single device is deployed for several months and collects data from multiple on-board sensors. For some research projects, storing these data in a central relational database (e.g.&nbsp;PostgreSQL, SQLite) can have important benefits. If storing bio-logger data in a relational database, explore one that provides native support or extensions for spatial data types and operations (e.g.&nbsp;PostGIS, SpatiaLite). For many, though, simply storing data as and organized collection of plain text files (e.g.&nbsp;*.csv) is sufficient.</p>
+<p>The quantity and diversity of data generated from bio-logging studies can quickly become overwhelming especially in situations where a single device is deployed for several months and collects data from multiple on-board sensors. For some research projects, storing these data in a central relational database (e.g.&nbsp;PostgreSQL) can have important benefits. If storing bio-logger data in a relational database, explore one that provides native support or extensions for spatial data types and operations (e.g.&nbsp;PostGIS, SpatiaLite). For many, though, simply storing data as and organized collection of plain text files (e.g.&nbsp;*.csv) is sufficient. This approach can be further improved by converting the comma-separated files to <code>parquet</code> files and leaning on the the Apache <code>arrow</code> package for R. These <code>parquet</code> files provide modern and efficient file compression, a columnar-based structure, and are optimized for big data. Even if a project starts as small data, it’s often useful to design your data management with growth in mind.</p>
 </section>
 <section id="wildlife-computers-data-sources" class="level2">
 <h2 class="anchored" data-anchor-id="wildlife-computers-data-sources">Wildlife Computers Data Sources</h2>

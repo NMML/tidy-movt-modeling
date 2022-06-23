@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-0.9.613">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Tidy Movement Modeling with R - Reading Source data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar floating">
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Reading Source data</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Tidy Movement Modeling with R</a> 
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+    <div class="sidebar-item-container"> 
+        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Welcome</a>
+      <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+        <i class="bi bi-chevron-right ms-2"></i>
+      </a>
+    </div>
+    <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Welcome to Tidy Movement Modeling with R</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./about-authors.html" class="sidebar-item-text sidebar-link">About the Authors</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./packages.html" class="sidebar-item-text sidebar-link">Package Installation &amp; Dependencies</a>
+  </div>
+</li>
+    </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+    <div class="sidebar-item-container"> 
+        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Telemetry Data is Messy</a>
+      <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+        <i class="bi bi-chevron-right ms-2"></i>
+      </a>
+    </div>
+    <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./data-sources.html" class="sidebar-item-text sidebar-link">Data Sources</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./why-tidy.html" class="sidebar-item-text sidebar-link">Why Tidy Telemetry Data</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tidy-messy-data.html" class="sidebar-item-text sidebar-link">Tidy-ing Messy Data for Easy Modeling</a>
+  </div>
+</li>
+    </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+    <div class="sidebar-item-container"> 
+        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">Data Exploration</a>
+      <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+        <i class="bi bi-chevron-right ms-2"></i>
+      </a>
+    </div>
+    <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./reading-data.html" class="sidebar-item-text sidebar-link active">Reading Source data</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./summary-tables.html" class="sidebar-item-text sidebar-link">Deployment Summary Tables</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./map-observations.html" class="sidebar-item-text sidebar-link">Mapping Telemetry Observations</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./behavior-plots.html" class="sidebar-item-text sidebar-link">Exploring Animal Behavior</a>
+  </div>
+</li>
+    </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+    <div class="sidebar-item-container"> 
+        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">Movement Modeling</a>
+      <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+        <i class="bi bi-chevron-right ms-2"></i>
+      </a>
+    </div>
+    <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./key-concepts.html" class="sidebar-item-text sidebar-link">Introduction to Key Concepts</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./history-of-crawl.html" class="sidebar-item-text sidebar-link">History of <code>crawl</code> and Movement Models in R</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./input-data.html" class="sidebar-item-text sidebar-link">Preparing Model Inputs</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./crawl-utils.html" class="sidebar-item-text sidebar-link">Easier <code>crawl</code>-ing with <code>crawlUtils</code></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./troubleshoot.html" class="sidebar-item-text sidebar-link">Troubleshooting Common Errors</a>
+  </div>
+</li>
+    </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+    <div class="sidebar-item-container"> 
+        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">Oh No! Paths Cross Land!</a>
+      <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+        <i class="bi bi-chevron-right ms-2"></i>
+      </a>
+    </div>
+    <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./path-routing-history.html" class="sidebar-item-text sidebar-link">Routing Marine Animal Paths Around Land</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro-to-pathroutr.html" class="sidebar-item-text sidebar-link">Introduction to the <code>pathroutr</code> Package</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./land-polygon.html" class="sidebar-item-text sidebar-link">Sourcing a Land (barrier) Polygon</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./pathroutr-demo.html" class="sidebar-item-text sidebar-link">A <code>pathroutr</code> Harbor Seal Example</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./pathroutr-cautions.html" class="sidebar-item-text sidebar-link">Cautions When Using <code>pathroutr</code></a>
+  </div>
+</li>
+    </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#read-in-csv-source-data" id="toc-read-in-csv-source-data" class="nav-link active" data-scroll-target="#read-in-csv-source-data">Read In CSV Source Data</a></li>
+  <li><a href="#efficient-data-storage-with-arrow" id="toc-efficient-data-storage-with-arrow" class="nav-link" data-scroll-target="#efficient-data-storage-with-arrow">Efficient Data Storage with Arrow</a></li>
+  <li><a href="#querying-our-data" id="toc-querying-our-data" class="nav-link" data-scroll-target="#querying-our-data">Querying Our Data</a>
+  <ul class="collapse">
+  <li><a href="#a-dplyr-example" id="toc-a-dplyr-example" class="nav-link" data-scroll-target="#a-dplyr-example">A <code>dplyr</code> example</a></li>
+  <li><a href="#a-duckdb-example" id="toc-a-duckdb-example" class="nav-link" data-scroll-target="#a-duckdb-example">A <code>duckdb</code> example</a></li>
+  </ul></li>
+  <li><a href="#create-our-location-dataset" id="toc-create-our-location-dataset" class="nav-link" data-scroll-target="#create-our-location-dataset">Create Our Location Dataset</a></li>
+  <li><a href="#convert-to-spatial-feature" id="toc-convert-to-spatial-feature" class="nav-link" data-scroll-target="#convert-to-spatial-feature">Convert to Spatial Feature</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Reading Source data</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<section id="read-in-csv-source-data" class="level2">
+<h2 class="anchored" data-anchor-id="read-in-csv-source-data">Read In CSV Source Data</h2>
+<p>Our first step will be to read our source data into R. For this example, we’ll be using data for six bearded seal deployments of the northwest coast of Alaska. The data were downloaded as comma-separated files from the Wildlife Computers Data Portal. All data have merged into a single <em>csv</em> file and grouped by a ‘DeployID’ unique identifier. The <code>raw-data/akbs_locs.csv</code> contains all of the Argos location estimates determined for each deployment as well as fastloc GPS location estimates when available. At a minimum, this file includes identifying columns such as <code>DeployID</code>, <code>PTT</code>, <code>Date</code>, <code>Quality</code>, <code>Type</code>, <code>Latitude</code>, and <code>Longitude</code>. If the Argos Kalman filtering approach has been enabled (which it should be for any modern tag deployment), then additional data will be found in columns that describe the error ellipses (e.g.&nbsp;<code>Error Semi-major axis</code>, <code>Error Semi-minor axis</code>, <code>Error Ellipse orientation</code>). Note, if the tag transmitted GPS/FastLoc data, this file will list those records as <code>Type = 'FastGPS'</code>.</p>
+<p>In many situations, the original source data may include multiple _*.csv_ or other delimited files. Instead of reading each file in one by one, the <code>purr::map_df()</code> function can be used to cycle through each _*.csv_ files in a directory and pass them to <code>readr::read_csv()</code> and, then, return a merged tibble/data.frame. This was the original case for these Alaska bearded seal data and the following code was used to create the combined _*.csv_ file from several _*-Locations.csv_ files.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>my_cols <span class="ot">&lt;-</span> <span class="fu">cols</span>(</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">DeployID =</span> <span class="fu">col_character</span>(),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">Ptt =</span> <span class="fu">col_integer</span>(),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">Instr =</span> <span class="fu">col_character</span>(),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Date =</span> <span class="fu">col_datetime</span>(<span class="st">"%H:%M:%S %d-%b-%Y"</span>),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">Type =</span> <span class="fu">col_character</span>(),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Quality =</span> <span class="fu">col_character</span>(),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">Latitude =</span> <span class="fu">col_double</span>(),</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">Longitude =</span> <span class="fu">col_double</span>(),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Error radius</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">col_integer</span>(),</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Error Semi-major axis</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">col_integer</span>(),</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Error Semi-minor axis</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">col_integer</span>(),</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Error Ellipse orientation</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">col_integer</span>(),</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">Offset =</span> <span class="fu">col_character</span>(),</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Offset orientation</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">col_character</span>(),</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">GPE MSD</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">col_character</span>(),</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">GPE U</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">col_character</span>(),</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">Count =</span> <span class="fu">col_character</span>(),</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">Comment =</span> <span class="fu">col_character</span>()</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>tbl_locs <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(<span class="st">'~/Downloads/akbs_data'</span>),</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>                       <span class="at">recursive =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>                       <span class="at">full.names =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>                       <span class="at">pattern =</span> <span class="st">"*-Locations.csv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">map_df</span>( <span class="sc">~</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(.x, <span class="at">col_types =</span> my_cols)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">write_csv</span>(<span class="at">file =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">'raw-data'</span>,<span class="st">'akbs_locs.csv'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>readr</code> package includes the <code>read_csv()</code> function which we will rely on to read the csv data into R. This function is very similar to <code>read.csv()</code> but provides some additional functionality and consistency. One important step is to specify the column types for each column in the data set. This saves an additional step post-read where we have to mutate each column type. Note, we also rely on the <code>here</code> package for reliable and consistent file paths. Lastly, the <code>janitor::clean_names()</code> function is used to provide a consistent transformation of column names (e.g.&nbsp;lower and snake case with no spaces).</p>
+<div class="cell">
+
+</div>
+</section>
+<section id="efficient-data-storage-with-arrow" class="level2">
+<h2 class="anchored" data-anchor-id="efficient-data-storage-with-arrow">Efficient Data Storage with Arrow</h2>
+<p>As previously mentioned, thoughtful data management is an important component of any movement modeling analysis. For some, a central relational database (e.g., PostgreSQL) will be a good solution. However, in many cases, an organized collection of _*.csv_ files or an in-memory database solution (e.g.&nbsp;SQLite, DuckDb) will be a good option. For this example, we’re going to rely on the Apache <code>arrow</code> package for R and a collection of <code>parquet</code> files as our efficient data source.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(arrow)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fs)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>dir_out <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>,<span class="st">"akbs_locs_parquet"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>fs<span class="sc">::</span><span class="fu">dir_delete</span>(dir_out)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>fs<span class="sc">::</span><span class="fu">dir_create</span>(dir_out)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>arrow<span class="sc">::</span><span class="fu">write_dataset</span>(akbs_locs, dir_out, <span class="at">partitioning =</span> <span class="st">"deploy_id"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(akbs_locs) <span class="co">#remove from memory</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>If we take a quick look at the director/file structure withing our output directory, <em>data/akbs_locs_parquet</em>, we can see that <code>arrow</code> created a separate subdirectory for each <code>deploy_id</code> and there’s a separate _*.parquet_ file within each of those subdirectories</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dir_ls</span>(dir_out) <span class="sc">%&gt;%</span> <span class="fu">path_rel</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>akbs_locs_parquet/deploy_id=EB2009_3000_06A1346
+akbs_locs_parquet/deploy_id=EB2009_3001_06A1332
+akbs_locs_parquet/deploy_id=EB2009_3002_06A1357
+akbs_locs_parquet/deploy_id=EB2011_3000_10A0219
+akbs_locs_parquet/deploy_id=EB2011_3001_10A0552
+akbs_locs_parquet/deploy_id=EB2011_3002_10A0200</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dir_ls</span>(dir_out, <span class="at">recurse =</span> <span class="cn">TRUE</span>, <span class="at">glob =</span> <span class="st">"*.parquet"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">path_rel</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>akbs_locs_parquet/deploy_id=EB2009_3000_06A1346/part-0.parquet
+akbs_locs_parquet/deploy_id=EB2009_3001_06A1332/part-0.parquet
+akbs_locs_parquet/deploy_id=EB2009_3002_06A1357/part-0.parquet
+akbs_locs_parquet/deploy_id=EB2011_3000_10A0219/part-0.parquet
+akbs_locs_parquet/deploy_id=EB2011_3001_10A0552/part-0.parquet
+akbs_locs_parquet/deploy_id=EB2011_3002_10A0200/part-0.parquet</code></pre>
+</div>
+</div>
+</section>
+<section id="querying-our-data" class="level2">
+<h2 class="anchored" data-anchor-id="querying-our-data">Querying Our Data</h2>
+<p>Now that we have our data organized with <code>arrow</code> and <code>parquet</code> files, we can explore ways the data can be queried and used in our analysis. There are two approaches and package frameworks we can rely on for querying:</p>
+<ol type="1">
+<li>The <code>dplyr</code> package’s support for <code>arrow</code>/<code>parquet</code></li>
+<li>Direct use of SQL syntax with <code>duckdb</code>’s <code>arrow</code>/<code>parquet</code> integration</li>
+</ol>
+<section id="a-dplyr-example" class="level3">
+<h3 class="anchored" data-anchor-id="a-dplyr-example">A <code>dplyr</code> example</h3>
+<p>Two common tasks we might want to perform are to calculate the number of location records by deployment and to filter our data set based on a particular date range.</p>
+<p>In this first example we create an open connection with our data set using the <code>arrow::open_dataset()</code> function and passing our <code>dir_out</code> path. Then, basic <code>dplyr</code> functions can return a table of location counts summarized by <code>deploy_id</code>. Note, unlike typical <code>dplyr</code> usage, the <code>collect()</code> function is required to actually return the data set records.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># open the dataset</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>akbs_ds <span class="ot">&lt;-</span> arrow<span class="sc">::</span><span class="fu">open_dataset</span>(dir_out) </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># query the dataset to calculate number of locations by deploy_id</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>akbs_ds <span class="sc">%&gt;%</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(deploy_id, <span class="at">name=</span><span class="st">"n_locs"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(deploy_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+  deploy_id           n_locs
+  &lt;chr&gt;                &lt;int&gt;
+1 EB2009_3000_06A1346   6491
+2 EB2009_3001_06A1332   5660
+3 EB2009_3002_06A1357   4913
+4 EB2011_3000_10A0219   9698
+5 EB2011_3001_10A0552   7559
+6 EB2011_3002_10A0200  10197</code></pre>
+</div>
+</div>
+<p>In this situation, we want to just look at locations from the months of August, September, and October. For this, the <code>month()</code> function from the <code>lubridate</code> package provides a way for us to filter by month integer.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># query the data set to only include the months of August, </span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># September, and October</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>akbs_ds <span class="sc">%&gt;%</span> </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">month</span>(date) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">8</span>,<span class="dv">9</span>,<span class="dv">10</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(deploy_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 17,597 × 18
+   deploy_id      ptt instr date                type  quality latitude longitude
+ * &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt; &lt;dttm&gt;              &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;     &lt;dbl&gt;
+ 1 EB2009_3000… 74627 Mk10  2009-08-01 00:03:43 Fast… 7           70.3     -163.
+ 2 EB2009_3000… 74627 Mk10  2009-08-01 00:07:12 Argos B           70.3     -163.
+ 3 EB2009_3000… 74627 Mk10  2009-08-01 00:17:46 Argos B           70.3     -163.
+ 4 EB2009_3000… 74627 Mk10  2009-08-01 01:21:43 Argos B           70.3     -163.
+ 5 EB2009_3000… 74627 Mk10  2009-08-01 01:45:08 Argos B           70.3     -163.
+ 6 EB2009_3000… 74627 Mk10  2009-08-01 01:55:35 Argos B           70.3     -163.
+ 7 EB2009_3000… 74627 Mk10  2009-08-01 02:28:28 Argos B           70.3     -163.
+ 8 EB2009_3000… 74627 Mk10  2009-08-01 03:00:06 Argos B           70.3     -163.
+ 9 EB2009_3000… 74627 Mk10  2009-08-01 03:32:36 Argos B           70.3     -163.
+10 EB2009_3000… 74627 Mk10  2009-08-01 04:13:08 Argos A           70.3     -163.
+# … with 17,587 more rows, and 10 more variables: error_radius &lt;dbl&gt;,
+#   error_semi_major_axis &lt;dbl&gt;, error_semi_minor_axis &lt;dbl&gt;,
+#   error_ellipse_orientation &lt;dbl&gt;, offset &lt;lgl&gt;, offset_orientation &lt;lgl&gt;,
+#   gpe_msd &lt;lgl&gt;, gpe_u &lt;lgl&gt;, count &lt;lgl&gt;, comment &lt;chr&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="a-duckdb-example" class="level3">
+<h3 class="anchored" data-anchor-id="a-duckdb-example">A <code>duckdb</code> example</h3>
+<p>DuckDB is a powerful in-process database management system that is easily installed as an R package and provides built-in support for our <code>arrow</code>/<code>parquet</code> data. With the <code>duckdb</code> package as well as <code>DBI</code>, we can pass standard SQL code to query our data set. This is especially useful if you are familiar/comfortable with SQL and you want to develop some fairly complex queries for your data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(duckdb)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># open connection to DuckDB</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(duckdb<span class="sc">::</span><span class="fu">duckdb</span>())</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># register the data set as a DuckDB table, and give it a name</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>duckdb<span class="sc">::</span><span class="fu">duckdb_register_arrow</span>(con, <span class="st">"akbs_locs"</span>, akbs_ds)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># query</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(con, </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>           <span class="st">"SELECT deploy_id, COUNT(*) AS n_locs </span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="st">           FROM akbs_locs </span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="st">           GROUP BY deploy_id"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            deploy_id n_locs
+1 EB2009_3000_06A1346   6491
+2 EB2011_3000_10A0219   9698
+3 EB2009_3001_06A1332   5660
+4 EB2011_3001_10A0552   7559
+5 EB2009_3002_06A1357   4913
+6 EB2011_3002_10A0200  10197</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># clean up</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">duckdb_unregister</span>(con, <span class="st">"akbs_locs"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbDisconnect</span>(con)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="create-our-location-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="create-our-location-dataset">Create Our Location Dataset</h2>
+<p>We’re going to rely on the typical <code>dplyr</code> approach to query our source data and distill it down to only the essential columns needed for our analysis. Also, since we have a combination of Argos and FastGPS data, we need to create a separate column for the number of satellites used during the fastloc GPS calculation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>akbs_ds <span class="ot">&lt;-</span> arrow<span class="sc">::</span><span class="fu">open_dataset</span>(dir_out)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>akbs_locs <span class="ot">&lt;-</span> akbs_ds <span class="sc">%&gt;%</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(deploy_id,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                date,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>                type,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>                quality,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>                latitude,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>                longitude,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>                error_semi_major_axis,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>                error_semi_minor_axis,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>                error_ellipse_orientation) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_sats =</span> <span class="fu">case_when</span>(</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>      type <span class="sc">==</span> <span class="st">"FastGPS"</span> <span class="sc">~</span> quality</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">quality =</span> <span class="fu">case_when</span>(</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>      type <span class="sc">==</span> <span class="st">"FastGPS"</span> <span class="sc">~</span> <span class="cn">NA</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_sats =</span> <span class="fu">as.integer</span>(num_sats)</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="convert-to-spatial-feature" class="level2">
+<h2 class="anchored" data-anchor-id="convert-to-spatial-feature">Convert to Spatial Feature</h2>
+<p>Since our data are, at the core, spatial observations we will benefit by converting our <code>akbs_locs</code> tibble/data.frame into a spatial point feature with the <code>sf</code>package. In order to accomplish this, we need to identify our coordinate columns and know the coordinate reference system (CRS). For all Argos and GPS data, the coordinate reference system is geographic with X and Y represented as longitude (-180, 180) and latitude (-90, 90). You should ensure the data are formatted as decimal degrees and not some combination of degrees, minutes, and seconds. To specify the CRS, we’ll rely on the designated EPSG code of <em>4326</em> which tells <code>sf</code> that our data are geographic.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>akbs_locs <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_as_sf</span>(akbs_locs, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"longitude"</span>,<span class="st">"latitude"</span>),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">crs =</span> <span class="st">"epsg:4326"</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>akbs_locs <span class="sc">%&gt;%</span> </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(deploy_id, date, geometry)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 44518 features and 2 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -175.137 ymin: -15.7054 xmax: 170.878 ymax: 73.478
+Geodetic CRS:  WGS 84
+# A tibble: 44,518 × 3
+   deploy_id           date                           geometry
+   &lt;chr&gt;               &lt;dttm&gt;                      &lt;POINT [°]&gt;
+ 1 EB2009_3000_06A1346 2009-06-23 00:00:00     (-162.42 66.38)
+ 2 EB2009_3000_06A1346 2009-06-23 02:41:12 (-162.5562 66.3168)
+ 3 EB2009_3000_06A1346 2009-06-23 03:07:11 (-162.4431 66.3656)
+ 4 EB2009_3000_06A1346 2009-06-23 04:08:10 (-162.3752 66.3216)
+ 5 EB2009_3000_06A1346 2009-06-23 04:15:36 (-162.3757 66.3222)
+ 6 EB2009_3000_06A1346 2009-06-23 04:27:12  (-162.3922 66.345)
+ 7 EB2009_3000_06A1346 2009-06-23 04:44:54 (-162.4411 66.3316)
+ 8 EB2009_3000_06A1346 2009-06-23 05:56:58 (-162.5032 66.3487)
+ 9 EB2009_3000_06A1346 2009-06-23 06:24:33 (-162.4993 66.3518)
+10 EB2009_3000_06A1346 2009-06-23 07:35:42 (-162.4958 66.3583)
+# … with 44,508 more rows</code></pre>
+</div>
+</div>
+<p>We can see that instead of separate columns for <code>longitude</code> and <code>latitude</code> we now have a single <code>geometry</code> column that describes the point geometry of each location. Also note that the metadata indicates the <em>Geodetic CRS</em> is specified as <em>WGS 84</em> which tells is our CRS specification is correctly set to geographic with longitude/latitude coordinate values.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
