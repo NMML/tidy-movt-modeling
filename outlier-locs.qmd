@@ -37,13 +37,19 @@ dat <- akbs_locs %>%
 
 dat_tr <- trip(dat, c("date","deploy_id"), correct_all = FALSE)
 
-tmp <-
-      suppressWarnings(try(
-        sda(
+keep <- sda(
           dat_tr,
           smax = 7.5
-        ),
-      silent = TRUE)
-      )
+        )
+
+akbs_locs <- akbs_locs %>% 
+  ungroup() %>% 
+  mutate(sda_keep = keep) %>% 
+  filter(sda_keep) %>% 
+  dplyr::select(-sda_keep)
 ```
 
+```{r}
+#| include: false
+saveRDS(akbs_locs, file = here::here("shared_cache","akbs_locs.rds"))
+```

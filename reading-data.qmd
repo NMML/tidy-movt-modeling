@@ -224,6 +224,66 @@ duckdb_unregister(con, "akbs_locs")
 dbDisconnect(con)
 ```
 
+An example of a more complex SQL query that might be of interest is to identify
+records with duplicate date-time columns within each deployment. We can do this
+with DuckDB and SQL.
+
+```{r}
+#| warning: false
+#| message: false
+
+con <- dbConnect(duckdb::duckdb())
+
+# register the data set as a DuckDB table, and give it a name
+duckdb::duckdb_register_arrow(con, "akbs_locs", akbs_ds)
+
+# query
+dbGetQuery(con, 
+           "SELECT a.deploy_id, a.date, a.quality,
+           a.latitude, a.longitude, a.error_radius
+            FROM akbs_locs a
+JOIN (SELECT deploy_id, date, COUNT(*),
+FROM akbs_locs 
+GROUP BY deploy_id, date
+HAVING count(*) > 1 ) b
+ON a.deploy_id = b.deploy_id AND
+a.date = b.date
+ORDER BY a.deploy_id, a.date")
+
+# clean up
+duckdb_unregister(con, "akbs_locs")
+dbDisconnect(con)
+```
+
+If we look at the above table, we can see the duplicate `date` column values
+but also notice the coordinate values are different. Instead of just
+removing one of the duplicates at random, we can use complex SQL to retain
+the duplicate value with the lower `error_radius`. 
+
+```{r}
+con <- dbConnect(duckdb::duckdb())
+
+# register the data set as a DuckDB table, and give it a name
+duckdb::duckdb_register_arrow(con, "akbs_locs", akbs_ds)
+
+# query
+dbGetQuery(con,
+           "select a.*
+            from
+            (select *
+            ,ROW_NUMBER() over (
+            partition by deploy_id, date
+            order by error_radius ASC) rn 
+            from akbs_locs) a
+            where a.rn = 1
+            order by deploy_id, date, error_radius")
+
+# clean up
+duckdb_unregister(con, "akbs_locs")
+dbDisconnect(con)
+```
+
+
 ## Create Our Location Dataset
 
 We're going to rely on the typical `dplyr` approach to query our source
@@ -244,6 +304,7 @@ akbs_locs <- akbs_ds %>%
                 quality,
                 latitude,
                 longitude,
+                error_radius,
                 error_semi_major_axis,
                 error_semi_minor_axis,
                 error_ellipse_orientation) %>% 
@@ -258,6 +319,26 @@ akbs_locs <- akbs_ds %>%
     ) %>% 
   collect()
 ```
+
+## Remove Duplicate Date-Time Records
+
+It's not unusual for a small number of records within a deployment to have
+duplicate times. We will want to identify and remove thiese records early in
+the process.
+
+```{r}
+#| warning: false
+#| message: false
+akbs_locs <- akbs_locs %>% 
+  group_by(deploy_id) %>% 
+  arrange(date, error_radius) %>% 
+  mutate(
+    rank = 1L,
+    rank = case_when(duplicated(date, fromLast = FALSE) ~
+                              lag(rank) + 1L, TRUE ~ rank)) %>% 
+  dplyr::filter(rank == 1)
+```
+
 
 ## Convert to Spatial Feature
 
