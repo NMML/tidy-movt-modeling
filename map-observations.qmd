@@ -9,16 +9,21 @@ akbs_locs <- readRDS(here::here("shared_cache","akbs_locs_filt.rds"))
 
 ## Mapping in R
 
-
+There are a number of workflows within R for making maps based on geospatial
+data. Here, we focus almost exclusively on mapping within the `ggplot2`
+package ecosystem. But, it is certainly worth the effort to learn about the
+other options including `tmap`, `mapview`, and `leaflet`.
 
 ## Choosing a Projection
 
-It's important that your spatial coordinates be projected. Geographic data
-that is represented in latitude and longitude coordinates cannot be used
-for animal movement modeling. Ideally, you will already have a good
-understanding of your study area and will have determined your target
-CRS. In this situation, you can use the `sf::st_transform()` function to
-transform your coordinates into this new projection.
+It's important that your spatial coordinates be projected. This is an important
+step when presenting your data as a map because the choice of projection can
+lead to unintentional perception bias and cause confusion. Just as importantly,
+geographic data that is represented in latitude and longitude coordinates cannot
+be used for animal movement modeling. Ideally, you will already have a good
+understanding of your study area and will have determined your target CRS. In
+this situation, you can use the `sf::st_transform()` function to transform your
+coordinates into this new projection.
 
 If you are unsure of what CRS might be a good choice for your data, the
 `crsuggest` package can provide some insight. We'll use this package to
@@ -37,12 +42,14 @@ top_crs <- suggest_crs(akbs_locs,
             gcs = 4326,
             units = "m")
 
-top_crs
+top_crs %>% 
+  dplyr::select(crs_code, crs_name, crs_gcs, crs_units)
 ```
  The first CRS suggested is the `r top_crs$crs_name[1]`. So, let's go ahead
  and transform our data and see what this projection looks like on a map with
  our data. As mentioned above, we'll use the `sf::st_transform()` function
- to do the transformation.
+ to do the transformation. To give ourselves some context, we'll load simple
+ world basemap data from the `rnaturalearth` package.
  
 ```{r}
 #|: message: false
@@ -51,21 +58,188 @@ library(ggplot2)
 library(rnaturalearth)
 library(rnaturalearthdata)
 
-world <- ne_countries(scale = "medium",returnclass = "sf")
+world <- ne_countries(scale = "medium",returnclass = "sf") %>% 
+  sf::st_make_valid()
 crs_code <- as.integer(top_crs$crs_code[1])
  
-locs <- akbs_locs %>% sf::st_transform(crs_code)
-world <- world %>% sf::st_transform(crs_code)
+filt_locs <- akbs_locs %>% sf::st_transform(crs_code)
+world <- world %>% sf::st_transform(crs_code) 
 
-ggplot() + geom_sf(data = world) +
-  geom_sf(data = locs) + 
+map <- ggplot() + geom_sf(data = world) +
+  geom_sf(data = filt_locs, size = 0.5, shape = 19) + 
   coord_sf(
-    xlim = sf::st_bbox(locs)[c(1,3)],
-    ylim = sf::st_bbox(locs)[c(2,4)])
+    xlim = sf::st_bbox(filt_locs)[c(1,3)],
+    ylim = sf::st_bbox(filt_locs)[c(2,4)]) +
+  theme_minimal()
+
+map
 ```
  
-
+This looks pretty good and, now, we can proceed with making a more complete
+set of maps for our observations. The focus is still more about understanding
+the nature and distribution of our data than making perfect maps. But, it
+is reasonable to expect these products might be useful within future
+publications or presentations.
 
 ## Map Observations with `ggplot2`
+
+There are three methods for visualizing our observation data:
+
+1. points on a map, colored by `deploy_id`
+2. lines on a map, colored by `deploy_id`
+3. grid of point density
+
+### Points on a Map
+
+For this, we can start with the figure we made above. But, we'll want to be more
+deliberate about grouping, color choices, and labels. For color choices, we're
+going to choose palettes from the `colorspace` package. Also, we'll take the
+opportunity to reduce the length of our `deploy_id` values.
+
+```{r}
+#| warning: false
+#| message: false
+#| fig-cap: Interactive map of locations from bio-loggers deployed on six
+#|   bearded seals in northwest Alaska
+library(colorspace)
+library(stringr)
+
+filt_locs <- filt_locs %>% 
+  dplyr::mutate(deploy_id = stringr::str_sub(deploy_id, 1,11))
+
+map <- ggplot() + geom_sf(data = world) +
+  geom_sf(data = filt_locs, aes(color = deploy_id),
+          size = 0.35, shape = 19) + 
+  coord_sf(
+    xlim = sf::st_bbox(filt_locs)[c(1,3)],
+    ylim = sf::st_bbox(filt_locs)[c(2,4)]) +
+  scale_color_discrete_qualitative(
+    palette = "Dark 3",
+    name = "deployment") +
+  labs(title = "Observed Locations of 6 Bearded Seals in NW Alaska",
+        subtitle = paste0("some data were censored based on a",
+                          "speed, distance, and angle filter")) +
+  theme_minimal()
+
+map
+
+```
+
+This is pretty good, but it would be nice if we could interact with the data and
+zoom in on particular regions. The `mapview` package provides an easy means for
+creating interactive maps of your spatial data. The one caveat to `mapview` is
+that it is based on the Web Mercator projection (a la Google Maps, etc) and
+there are some extra steps required if your tracks cross the dateline at 180
+(which ours do ... yay! fun!)
+
+What we need to do is transform our data back to geographic and, then,
+convert the coordinates from -180:180 to 0:360. We will use a custom
+written function to handle this for us. The `st_to_360()` function
+is not needed for data sets that do not cross the 180 meridian.
+
+```{r st-to-360}
+st_to_360 <- function(g) {
+  coords <- (sf::st_geometry(g) + c(360,90)) %% c(360) - c(0,90)
+  g <- sf::st_set_geometry(g,coords) %>% sf::st_set_crs(4326)
+  return(g)
+}
+```
+
+We will use the ESRI Ocean Basemap for our background layer and the same
+qualitative color palette we used above. The `mapview` package is based on the
+web mapping library, `leaflet`. Because of that, these interactive maps are
+only available when rendering to HTML or other HTML capable viewers. 
+
+```{r wrap-dateline}
+#| label: filt-locs-mapview
+#| fig-cap: Interactive map of locations from bio-loggers deployed on six
+#|   bearded seals in northwest Alaska
+library(mapview)
+
+sf::st_transform(filt_locs,4326) %>% st_to_360() %>% 
+mapview::mapview(map.types = "Esri.OceanBasemap",
+                 zcol = "deploy_id",
+                 layer.name = "Deployment ID",
+                 col.regions = qualitative_hcl(palette = "Dark 3", n =6),
+                 cex = 1.5, lwd = 0)
+```
+
+### Lines on a Map
+
+In actuality, the point observations from our deployments represent an 
+underlying movement path for each animal. And, later, we'll work to create
+a movement model that estimates this path. But, for now, we can approximate
+this by simply connecting the points into an ordered path. The `sf` package
+can represent a range of spatial data types, including _LINESTRING_. Since we have
+multiple lines within our data set, we'll create a _MULTILINESTRING_. Creating
+a spatial line from a set of spatial points isn't, initially, intuitive. We need
+to ensure key attributes are retained during the conversion. First, we need to
+identify our 'grouping' variable. In this case, as with our points, the 
+`deploy_id` identifies our groups. Within each group, our points need to be
+properly ordered. The `date` column provides this order for us. Lastly, when
+we combine the individual points into a line, all of the point level attributes
+(e.g. date, location type, error) will be lost. If there are key attributes
+that should be retained, then those need to either be included as grouping
+variables or stored in a table that can be, later, joined with the lines
+data. We are going to keep things simple and not worry about line attributes
+beyond `deploy_id`.
+
+```{r}
+filt_lines <- filt_locs %>% 
+  dplyr::group_by(deploy_id) %>% 
+  dplyr::arrange(date) %>% 
+  dplyr::summarise(do_union = FALSE) %>% 
+  sf::st_cast("MULTILINESTRING")
+```
+
+We can use much of the same code as before and just replace `filt_locs` with
+`filt_lines`.
+
+```{r}
+#| warning: false
+#| message: false
+#| fig-cap: Interactive map of connected movement paths from bio-loggers deployed on six
+#|   bearded seals in northwest Alaska
+library(colorspace)
+library(stringr)
+
+map <- ggplot() + geom_sf(data = world) +
+  geom_sf(data = filt_lines, aes(color = deploy_id),
+          lwd = 0.5) + 
+  coord_sf(
+    xlim = sf::st_bbox(filt_lines)[c(1,3)],
+    ylim = sf::st_bbox(filt_lines)[c(2,4)]) +
+  scale_color_discrete_qualitative(
+    palette = "Dark 3",
+    name = "deployment") +
+  labs(title = "Connected Movement Paths of 6 Bearded Seals in NW Alaska",
+        subtitle = paste0("some data were censored based on a",
+                          "speed, distance, and angle filter")) +
+  theme_minimal()
+
+map
+
+```
+
+And, just as before, we can create an interactive map with `mapview`, this
+time, showing our connected movement paths. Note that, before, we relied on the
+`col.regions` parameter to specify colors for our points. For lines, we specify
+the color palette with `color`. Also, note, the `lwd` was increased to **1.5**
+and the `cex` specification was removed.
+
+```{r wrap-dateline}
+#| label: filt-lines-mapview
+#| fig-cap: Interactive map of connected movement paths from bio-loggers deployed on six
+#|   bearded seals in northwest Alaska
+library(mapview)
+
+sf::st_transform(filt_lines,4326) %>% st_to_360() %>% 
+mapview::mapview(map.types = "Esri.OceanBasemap",
+                 zcol = "deploy_id",
+                 layer.name = "Deployment ID",
+                 color = qualitative_hcl(palette = "Dark 3", n =6),
+                 lwd = 1.5)
+```
+
 
 
