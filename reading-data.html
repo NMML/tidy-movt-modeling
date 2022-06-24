@@ -514,8 +514,8 @@ akbs_locs_parquet/deploy_id=EB2011_3002_10A0200/part-0.parquet</code></pre>
 <pre><code># A tibble: 6 × 2
   deploy_id           n_locs
   &lt;chr&gt;                &lt;dbl&gt;
-1 EB2009_3000_06A1346   6491
-2 EB2011_3000_10A0219   9698
+1 EB2011_3000_10A0219   9698
+2 EB2009_3000_06A1346   6491
 3 EB2009_3001_06A1332   5660
 4 EB2011_3001_10A0552   7559
 5 EB2009_3002_06A1357   4913
@@ -629,14 +629,16 @@ akbs_locs_parquet/deploy_id=EB2011_3002_10A0200/part-0.parquet</code></pre>
 <span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                error_ellipse_orientation) <span class="sc">%&gt;%</span> </span>
 <span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_sats =</span> <span class="fu">case_when</span>(</span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>      type <span class="sc">==</span> <span class="st">"FastGPS"</span> <span class="sc">~</span> quality</span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>      ),</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">quality =</span> <span class="fu">case_when</span>(</span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>      type <span class="sc">==</span> <span class="st">"FastGPS"</span> <span class="sc">~</span> <span class="cn">NA</span></span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_sats =</span> <span class="fu">as.integer</span>(num_sats)</span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>      type <span class="sc">==</span> <span class="st">"FastGPS"</span> <span class="sc">~</span> quality,</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">quality =</span> <span class="fu">case_when</span>(</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>      type <span class="sc">==</span> <span class="st">"FastGPS"</span> <span class="sc">~</span> <span class="cn">NA_character_</span>,</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> quality</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_sats =</span> <span class="fu">as.integer</span>(num_sats)</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="remove-duplicate-date-time-records" class="level2">
