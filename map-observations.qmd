@@ -54,6 +54,7 @@ top_crs %>%
 ```{r}
 #|: message: false
 #|: warning: false
+#| fig-asp: 1
 #| fig-cap: Basic map of locations from bio-loggers deployed on six
 #|   bearded seals in northwest Alaska
 library(ggplot2)
@@ -101,6 +102,7 @@ opportunity to reduce the length of our `deploy_id` values.
 ```{r}
 #| warning: false
 #| message: false
+#| fig-asp: 1
 #| fig-cap: Map of locations from bio-loggers deployed on six
 #|   bearded seals in northwest Alaska
 library(colorspace)
@@ -139,7 +141,10 @@ convert the coordinates from -180:180 to 0:360. We will use a custom
 written function to handle this for us. The `st_to_360()` function
 is not needed for data sets that do not cross the 180 meridian.
 
-```{r st-to-360}
+```{r}
+#| label: st-to-360
+#| warning: false
+#| message: false
 st_to_360 <- function(g) {
   coords <- (sf::st_geometry(g) + c(360,90)) %% c(360) - c(0,90)
   g <- sf::st_set_geometry(g,coords) %>% sf::st_set_crs(4326)
@@ -153,6 +158,8 @@ web mapping library, `leaflet`. Because of that, these interactive maps are
 only available when rendering to HTML or other HTML capable viewers. 
 
 ```{r wrap-dateline}
+#| warning: false
+#| message: false
 #| label: filt-locs-mapview
 #| fig-cap: Interactive map of locations from bio-loggers deployed on six
 #|   bearded seals in northwest Alaska
@@ -187,6 +194,8 @@ data. We are going to keep things simple and not worry about line attributes
 beyond `deploy_id`.
 
 ```{r}
+#| warning: false
+#| message: false
 filt_lines <- filt_locs %>% 
   dplyr::group_by(deploy_id) %>% 
   dplyr::arrange(date) %>% 
@@ -200,6 +209,7 @@ We can use much of the same code as before and just replace `filt_locs` with
 ```{r}
 #| warning: false
 #| message: false
+#| fig-asp: 1
 #| fig-cap: Map of connected movement paths from bio-loggers deployed on six
 #|   bearded seals in northwest Alaska
 library(colorspace)
@@ -230,6 +240,8 @@ the color palette with `color`. Also, note, the `lwd` was increased to **1.5**
 and the `cex` specification was removed.
 
 ```{r wrap-dateline}
+#| warning: false
+#| message: false
 #| label: filt-lines-mapview
 #| fig-cap: Interactive map of connected movement paths from bio-loggers deployed on six
 #|   bearded seals in northwest Alaska
@@ -244,4 +256,94 @@ mapview::mapview(map.types = "Esri.OceanBasemap",
 ```
 
 
+### Point Density Map
+
+Over-plotting occurs when multiple points are plotted on top of one another 
+because of their close proximity. This can make it difficult fully understand
+the distribution of points. To address this, we can create a uniformspatial grid 
+and
+summarize the number of points within each grid cell. This density grid should
+provide a more representative visualization of our data.
+
+The first step in this process is to create a spatial grid tesselation. We need
+to decide on a cell resolution and the shape of our grid cells. There are no
+specific rules regarding grid cell resolution. Although, the memory and
+computational time required to process grid data increases quickly as changes in
+cell dimensions lead to non-linear increases in the number of cells. A spatial
+grid can be any regular tesselation of the study area. We have three possible
+regular tesselations: equilateral triangles, squares, and regular hexagons. Of
+those, squares are the most common but hexagons have some key benefits. 
+
+:::{.callout-note}
+### Why Hexagons
+The following explanation comes from  Matt Strimas-Mackey at 
+https://strimas.com/post/hexagonal-grids/
+
+Regular hexagons are the closest shape to a circle that can be used for the
+regular tessellation of a plane and they have additional symmetries compared to
+squares. These properties give rise to the following benefits.
+
+- Reduced edge effects: a hexagonal grid gives the lowest perimeter to area ratio of any regular tessellation of the plane. In practice, this means that edge effects are minimized when working with hexagonal grids. This is essentially the same reason beehives are built from hexagonal honeycomb: it is the arrangement that minimizes the amount of material used to create a lattice of cells with a given volume.
+- All neighbours are identical: square grids have two classes of neighbours, those in the cardinal directions that share an edge and those in diagonal directions that share a vertex. In contrast, a hexagonal grid cell has six identical neighbouring cells, each sharing one of the six equal length sides. Furthermore, the distance between centroids is the same for all neighbours.
+- Better fit to curved surfaces: when dealing with large areas, where the curvature of the earth becomes important, hexagons are better able to fit this curvature than squares. This is why soccer balls are constructed of hexagonal panels.
+:::
+
+Creating our grid within R is pretty straightforward using the 
+`sf::st_make_grid()` function. We'll set our cellsize
+to 50,000 meters (25 km) and, then, create an index for each of our cells. The
+`sf::st_join()` function will intersect the hexagonal grid with our locations
+so we can count the number of locations within each cell. One thing we need to
+decide is whether to aggregated the counts across all observations or keep the
+grouped approach and determine separate counts for each `deploy_id`. Since we
+are still interested in understanding the distribution and nature of our data
+as best as possible, it seems sensible to keep the count separated by 
+`deploy_id`. However, with more than 6 deployments, this could become
+untenable to plot and fully explore.
+
+```{r}
+#| warning: false
+#| message: false
+hexgrid <- sf::st_make_grid(st_bbox(filt_locs) %>% st_as_sfc(), 
+                            cellsize = 50*1000,
+                            what = "polygons", square = FALSE) 
+hexgrid <- sf::st_sf(index = 1:length(lengths(hexgrid)), hexgrid)
+
+hexbin <- sf::st_join(filt_locs, hexgrid, join = st_intersects)
+
+locs_count <- hexgrid %>%
+  dplyr::left_join(
+    dplyr::count(hexbin, index, deploy_id) %>%
+      tibble::as_tibble() %>%
+      dplyr::select(deploy_id, index, ct=n)
+  ) %>% tidyr::drop_na()
+```
+
+
+```{r}
+#| warning: false
+#| message: false
+#| fig-asp: 1
+#| fig-cap: Maps showing the spatial distribution of location observations 
+#|   from bio-loggers deployed on six
+#|   bearded seals in northwest Alaska
+library(scico)
+map <- ggplot() + geom_sf(data = world) +
+  geom_sf(data = locs_count, 
+          size = 0.125,
+          aes(fill = ct)) +
+  coord_sf(
+    xlim = sf::st_bbox(filt_lines)[c(1,3)],
+    ylim = sf::st_bbox(filt_lines)[c(2,4)]) +
+  scale_fill_scico(palette = 'imola',
+                    trans = "log10",
+    name = "number of locations",
+    guide = guide_colorbar(title.position = "bottom", barwidth = 15, 
+                           barheight = 0.5, title.hjust = 0.5)) + 
+  facet_wrap(~ deploy_id) +
+  theme(legend.position = "bottom") +
+  ggtitle("Spatial distribution of bearded seal bio-logger locations") +
+  labs(caption = bquote("One hexagonal cell represents 50"~km^2))
+  
+map
+```
 
