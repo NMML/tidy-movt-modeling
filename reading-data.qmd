@@ -316,10 +316,12 @@ akbs_locs <- akbs_ds %>%
                 error_ellipse_orientation) %>% 
   mutate(
     num_sats = case_when(
-      type == "FastGPS" ~ quality
+      type == "FastGPS" ~ quality,
+      TRUE ~ NA_character_
       ),
     quality = case_when(
-      type == "FastGPS" ~ NA
+      type == "FastGPS" ~ NA_character_,
+      TRUE ~ quality
     ),
     num_sats = as.integer(num_sats)
     ) %>% 
