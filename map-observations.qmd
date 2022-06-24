@@ -54,6 +54,8 @@ top_crs %>%
 ```{r}
 #|: message: false
 #|: warning: false
+#| fig-cap: Basic map of locations from bio-loggers deployed on six
+#|   bearded seals in northwest Alaska
 library(ggplot2)
 library(rnaturalearth)
 library(rnaturalearthdata)
@@ -99,7 +101,7 @@ opportunity to reduce the length of our `deploy_id` values.
 ```{r}
 #| warning: false
 #| message: false
-#| fig-cap: Interactive map of locations from bio-loggers deployed on six
+#| fig-cap: Map of locations from bio-loggers deployed on six
 #|   bearded seals in northwest Alaska
 library(colorspace)
 library(stringr)
@@ -198,7 +200,7 @@ We can use much of the same code as before and just replace `filt_locs` with
 ```{r}
 #| warning: false
 #| message: false
-#| fig-cap: Interactive map of connected movement paths from bio-loggers deployed on six
+#| fig-cap: Map of connected movement paths from bio-loggers deployed on six
 #|   bearded seals in northwest Alaska
 library(colorspace)
 library(stringr)
