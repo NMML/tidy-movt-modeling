@@ -1273,6 +1273,16 @@
         "viridisLite"
       ]
     },
+    "scico": {
+      "Package": "scico",
+      "Version": "1.3.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5a01105ea6161bd623a2318f7e370271",
+      "Requirements": [
+        "scales"
+      ]
+    },
     "servr": {
       "Package": "servr",
       "Version": "0.24",
