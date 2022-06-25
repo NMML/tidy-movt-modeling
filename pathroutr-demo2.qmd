@@ -1,0 +1,111 @@
+---
+title: "A `pathroutr` Bearded Seal Example"
+---
+
+## Routing Predicted Tracks Around Land
+
+We're going to revisit our example of bearded seal movement along the
+northwest Alaska coast. And, we're going to walk through this demo relying
+on the helper functions included within the `crawlUtils` package.
+
+```{r}
+#| include: false
+akbs_locs <- readRDS(here::here("shared_cache","akbs_locs_complete.rds"))
+akbs_preds <- readRDS(here::here("shared_cache","akbs_preds.rds"))
+akbs_sims <- readRDS(here::here("shared_cache","akbs_sims.rds"))
+```
+
+```{r}
+library(crawl)
+library(crawlUtils)
+library(pathroutr)
+library(dplyr)
+library(purrr)
+library(ggplot2)
+library(sf)
+```
+
+## Sourcing Land/Barrier Data
+
+The first thing we need to do is source the relevant land (or other barrier)
+polygon data for our study area. The `crawlUtils` package has a built-in 
+function for downloading a global coastline data file based on the
+OpenStreetMap data. This is a relatively large file so the `cu_download_osm()`
+function downloads a local copy for you. The initial download is likely
+between 750 MG and 1 GB of data.
+
+```{r}
+#| label: get-osm-land
+#| warning: false
+#| message: false
+#| eval: false
+
+crawlUtils::cu_download_osm()
+# > This function will download a considerable amount of coastline data.
+# > Are you sure you want to proceed? [y/n]: y
+
+```
+
+We, obviously, don't need the entire global coastline for our study.
+So, we will want to crop the downloaded data to our study area. But,
+it's important that we provide a sensible buffer to fully capture
+the available land. There's no exact science for this value, but can be
+especially important in smaller areas with complicated coastline. FOr
+this example, we'll set the buffer to 100km.
+
+```{r}
+#| label: create-bbox
+#| warning: false
+#| message: false
+sim_bb <- map(akbs_locs$sims, crawlUtils::st_bbox_list, as_sfc=TRUE)
+bb <- crawlUtils::st_bbox_list(sim_bb, as_sfc=TRUE) %>%
+  st_buffer(100000)
+
+```
+
+The `crawlUtils::cu_osm_coast()` function will take the bounding box
+and apply that to the previously downloaded coastline data from 
+OpenStreetMap.
+
+```{r}
+#| label: crop-osm-land
+#| warning: false
+#| message: false
+#| eval: false
+# Crop OSM coastline previously downloaded
+land <- cu_osm_coast(bb)
+```
+
+```{r}
+#| include: false
+land <- readRDS(here::here("shared_cache","land.rds"))
+```
+
+Let's revisit our previous plot and use the downloaded coastline
+data instead of the data from `rnaturalearth` package
+
+```{r}
+#| label: plot-with-osm-land
+#| warning: false
+#| message: false
+#| fig-asp: 1
+world <- land %>% 
+  sf::st_transform(st_crs(akbs_preds))
+
+map <- ggplot() + geom_sf(data = world) +
+  geom_sf(data = akbs_sims, aes(color = deploy_id), alpha = 0.1, size=0.5) +
+  geom_sf(data = akbs_preds, aes(color = deploy_id),
+          size = 0.3) + 
+  coord_sf(
+    xlim = sf::st_bbox(akbs_sims)[c(1,3)],
+    ylim = sf::st_bbox(akbs_sims)[c(2,4)]) +
+  scale_color_discrete_qualitative(
+    palette = "Dark 3",
+    name = "deployment") +
+  labs(title = "Predicted Movement of 6 Bearded Seals in NW Alaska",
+        subtitle = paste0("most likely path and imputed paths shown"),
+       caption = "coastline data provided by OpenStreetMap") +
+  theme_minimal()
+
+map
+```
