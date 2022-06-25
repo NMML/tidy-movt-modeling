@@ -313,3 +313,9 @@ map <- ggplot() + geom_sf(data = world) +
 map
 ```
 
+```{r}
+#| include: false
+saveRDS(akbs_locs, file = here::here("shared_cache","akbs_locs_complete.rds"))
+saveRDS(akbs_preds, file = here::here("shared_cache","akbs_preds.rds"))
+saveRDS(akbs_sims, file = here::here("shared_cache","akbs_sims.rds"))
+```
