@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-0.9.618">
+<meta name="generator" content="quarto-0.9.619">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -15,6 +15,69 @@ span.underline{text-decoration: underline;}
 div.column{display: inline-block; vertical-align: top; width: 50%;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -248,7 +311,16 @@ ul.task-list{list-style: none;}
 </nav>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#prepare-data-for-crawlutils" id="toc-prepare-data-for-crawlutils" class="nav-link active" data-scroll-target="#prepare-data-for-crawlutils">Prepare Data for <code>crawlUtils</code></a></li>
+  <li><a href="#fit-basic-ctcrw-model" id="toc-fit-basic-ctcrw-model" class="nav-link" data-scroll-target="#fit-basic-ctcrw-model">Fit Basic CTCRW Model</a></li>
+  <li><a href="#predict-locations" id="toc-predict-locations" class="nav-link" data-scroll-target="#predict-locations">Predict Locations</a></li>
+  <li><a href="#multiple-imputation-for-uncertainty" id="toc-multiple-imputation-for-uncertainty" class="nav-link" data-scroll-target="#multiple-imputation-for-uncertainty">Multiple Imputation for Uncertainty</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -269,9 +341,199 @@ ul.task-list{list-style: none;}
 
 </header>
 
-<p>This is a Quarto website</p>
+<p>In recent months, the <code>crawlUtils</code> package has been developed to assist with and streamline the most common pipelines for modeling animal movement with the <code>crawl</code> and <code>pathroutr</code> packages. These approaches won’t work for everyone in every situation. But, they are good starting points and, hopefully, allow you to proceed quickly from a tidy data set of observations to a fitted model with predicted tracks and locations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(crsuggest)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(crawl)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(crawlUtils)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pathroutr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="prepare-data-for-crawlutils" class="level2">
+<h2 class="anchored" data-anchor-id="prepare-data-for-crawlutils">Prepare Data for <code>crawlUtils</code></h2>
+<p>We’re going to start with our <code>sf</code> simple feature collection that has been processed with the speed, distance, and angle filter. While exploring and mapping the observations, the <code>crsuggest</code> package was used to determine an optimal coordinate reference system for our data. In the end, you know your data and your region the best and this knowledge should form the basis of your decision regarding the CRS you will use.</p>
+<p>Since we’ve already explored our data with maps using the top CRS suggested, we’ll continue with that</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>akbs_epsg <span class="ot">&lt;-</span> crsuggest<span class="sc">::</span><span class="fu">suggest_top_crs</span>(akbs_locs)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>akbs_locs <span class="ot">&lt;-</span> akbs_locs <span class="sc">%&gt;%</span> </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_transform</span>(akbs_epsg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>crwUtils</code> package has some expectations regarding the column names that we’ll need to adjust in our data. Namely, we need to include the number of satellites for fastLoc GPS observations within the <code>quality</code> column and our <code>date</code> column needs to be renamed to <code>datetime</code>.</p>
+<p>There are also some additional columns required so that multiple source data types (FastGPS, Argos least-squares, and Argos Kalman filter) can be used simultaneously within the same deployment. This is handled for us by simply calling the <code>cu_add_argos_cols()</code> function. Note, use of this function does require the following columns with exact names:</p>
+<ol type="1">
+<li><em>type</em>, indicate the type of location,</li>
+<li><em>quality</em> which indicates the Argos quality of the location,</li>
+<li>the Argos KF diagnostics: error_semi_major_axis_, <em>error_semi_minor_axis</em>, and <em>error_ellipse_orientation</em></li>
+</ol>
+<p>Because our data set already has these columns, there’s no additional edits needed and we can just call the function with no arguments.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>akbs_locs <span class="ot">&lt;-</span> akbs_locs <span class="sc">%&gt;%</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">quality =</span> <span class="fu">case_when</span>(</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      type <span class="sc">==</span> <span class="st">"FastGPS"</span> <span class="sc">~</span> <span class="fu">as.character</span>(num_sats),</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> quality</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">type =</span> <span class="fu">case_when</span>(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      type <span class="sc">==</span> <span class="st">"User"</span> <span class="sc">~</span> <span class="st">"known"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> type</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">datetime =</span> date </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cu_add_argos_cols</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="fit-basic-ctcrw-model" class="level2">
+<h2 class="anchored" data-anchor-id="fit-basic-ctcrw-model">Fit Basic CTCRW Model</h2>
+<p>We’re now ready to, finally, fit our CTCRW model with <code>crawl</code>. Because we have multiple deployments that can be fit independently, we need to make one final enhancement to our tidy data structure — created a nested tibble. Nesting takes advantage of list columns in R and allows us to store data objects within our tibble. In this case, we’ll create a single row for each deployment and our data will be stored within a special <code>data</code> column. As we progress through the fitting process, we’ll store results such as model fits and predictions as additional columns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>akbs_locs <span class="ot">&lt;-</span> <span class="fu">group_by</span>(akbs_locs, deploy_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">nest</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, we can proceed to fit a CTCRW movement model for each of our deployments. The results of each fit will be stored in the <code>fit</code> column. Previous examples for this step often required careful attention and customization of various model parameters. <code>crawlUtils</code> aims to provide a generalized solution that should work for most scenarios.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>akbs_locs <span class="ot">&lt;-</span> akbs_locs <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">fit =</span> <span class="fu">cu_crw_argos</span>(data)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>While fitting the model, you may see a warning that indicates: &gt; Warning: Animal 1 has both LS and KF Argos location types or other unknown types! &gt; Keeping KF becuase KF represents the larger percentage of the observations.</p>
+<p>This is because, currently, it’s not possible to accommodate both the Kalman Filter (KF) error and the Least Squares (LS) quality error (e.g.&nbsp;A, B, 0, 1, 2, 3). The function will examine your data and keep the error that is used across the majority of locations in that deployment. It is possible (preferable) to have both KF or LS and FastGPS locations within the same deployment.</p>
+<p>Let’s take a quick look at the first model fit to make sure there aren’t any red flags in the result. If you want to look at all the fits with one call you can eliminate the <code>pluck(1)</code> portion in the code below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>akbs_locs <span class="sc">%&gt;%</span> <span class="fu">pull</span>(fit) <span class="sc">%&gt;%</span> <span class="fu">pluck</span>(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+
+Continuous-Time Correlated Random Walk fit
+
+Models:
+--------
+Movement   ~ 1
+Error   ~0 + ln.sd.x ~0 + ln.sd.y ~error.corr
+
+                     Parameter Est. St. Err. 95% Lower 95% Upper
+ln tau.x ln.sd.x              1.000        .         .         .
+ln tau.y ln.sd.y              1.000        .         .         .
+ln sigma (Intercept)          7.652    0.014     7.624      7.68
+ln beta (Intercept)           2.220    0.176     1.876     2.564
 
 
+Log Likelihood = -101576.783 
+AIC = 203157.565 </code></pre>
+</div>
+</div>
+</section>
+<section id="predict-locations" class="level2">
+<h2 class="anchored" data-anchor-id="predict-locations">Predict Locations</h2>
+<p>With our model fits in hand, we can use that model to predict locations at regular (or otherwise specified) intervals. These predictions will form the basis of our subsequent analyses. And, as such, you should consider the prediction interval carefully. The continuous nature of <code>crawl</code>’s approach means you can always come back and predict again at a different interval without having to re-fit the model.</p>
+<p>There are some built in parsers for time so you can say, for example <code>predTime="1 hours"</code> or <code>predTime="6 hours"</code> or <code>predTime="20 minutes"</code> and the prediction function will generate the intervals for you. You can also provide a custom vector of prediction times. Note that we specify <code>as_sf=TRUE</code> so an <code>sf</code> point object is returned.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>akbs_locs <span class="ot">&lt;-</span> akbs_locs <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred =</span> <span class="fu">cu_crw_predict</span>(fit, <span class="at">predTime=</span><span class="st">"1 hours"</span>, <span class="at">as_sf=</span><span class="cn">TRUE</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now that we have our predictions, let’s revisit one of our previous maps and, this time, create a path based on the hourly predictions instead of the raw observations.</p>
+<p>The first thing we need to do is extract the predictions from our nested tibble. We can accomplish this with the <code>tidyr::unnest()</code> function and, then, filter the resulting data to only include predicted locations (<code>locType == "p"</code>). The <code>sf</code> geometry data is preserved but we need just do a quick <code>st_as_sf()</code> call to reestablish our data as and <code>sf</code> object. Lastly, as before, we’ll want to convert the predicted point data into lines.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>akbs_preds <span class="ot">&lt;-</span> akbs_locs <span class="sc">%&gt;%</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(<span class="at">cols=</span>pred) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(locType <span class="sc">==</span> <span class="st">"p"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(deploy_id, datetime, geometry) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_as_sf</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(datetime) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">deploy_id =</span> stringr<span class="sc">::</span><span class="fu">str_sub</span>(deploy_id, <span class="dv">1</span>,<span class="dv">11</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">do_union =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_cast</span>(<span class="st">"MULTILINESTRING"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-fig.asp="1">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(colorspace)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rnaturalearth)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rnaturalearthdata)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>world <span class="ot">&lt;-</span> <span class="fu">ne_countries</span>(<span class="at">scale =</span> <span class="st">"medium"</span>,<span class="at">returnclass =</span> <span class="st">"sf"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_make_valid</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_transform</span>(akbs_epsg)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>map <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span> <span class="fu">geom_sf</span>(<span class="at">data =</span> world) <span class="sc">+</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> akbs_preds, <span class="fu">aes</span>(<span class="at">color =</span> deploy_id),</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>          <span class="at">lwd =</span> <span class="fl">0.5</span>) <span class="sc">+</span> </span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>(</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">xlim =</span> sf<span class="sc">::</span><span class="fu">st_bbox</span>(akbs_preds)[<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)],</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylim =</span> sf<span class="sc">::</span><span class="fu">st_bbox</span>(akbs_preds)[<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">4</span>)]) <span class="sc">+</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_discrete_qualitative</span>(</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette =</span> <span class="st">"Dark 3"</span>,</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">"deployment"</span>) <span class="sc">+</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Predicted Movement Paths of 6 Bearded Seals in NW Alaska"</span>,</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">"paths based on hourly predictions"</span>)) <span class="sc">+</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="crawl-utils_files/figure-html/prediction-plot-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="multiple-imputation-for-uncertainty" class="level2">
+<h2 class="anchored" data-anchor-id="multiple-imputation-for-uncertainty">Multiple Imputation for Uncertainty</h2>
+<p>The predicted path represents the most likely movement for the animal given the observed locations and their reported error. A single line, however, doesn’t fully communicate the uncertainty associated with each prediction. To better demonstrate this, we’ll rely on multiple imputation from our model fit to create a sample of additionally possible tracks for each deployment. These tracks along with the predicted track should communicate a better picture of where the animals might have traveled during the deployment.</p>
+<p>The <code>crawlUtils</code> package provides a helper function, <code>cu_crw_sample</code>, that handles creation of tracks via multiple imputation. All we need to provide are the number of simulated tracks we’d like to generate and the desired prediction interval. To keep things from exploding computationally, we’ll set the number of generated tracks at 8 and keep our prediction time to 1 hour.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>akbs_locs <span class="ot">&lt;-</span> akbs_locs <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">sims =</span> <span class="fu">cu_crw_sample</span>(<span class="at">size=</span><span class="dv">8</span>, fit, <span class="at">predTime=</span><span class="st">"1 hours"</span>, <span class="at">as_sf=</span><span class="cn">TRUE</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As before, we need to extract the pertinent spatial information from our nested tibble. In this case, each of our 8 simulated tracks are stored within a list of <code>sf</code> objects in the <code>sims</code> column. We need to <em>unnest</em> the <code>sims</code> column like before but, also, combine the 8 separate simulated tracks into a single object.</p>
+<p>Oh, and then don’t forget to convert each of the simulations into lines!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>akbs_sims <span class="ot">&lt;-</span> akbs_locs <span class="sc">%&gt;%</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sims =</span> <span class="fu">list</span>(<span class="fu">bind_rows</span>(sims, <span class="at">.id =</span> <span class="st">"sim_id"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="at">cols=</span>sims) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(deploy_id, sim_id, datetime, geometry) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(deploy_id,sim_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(datetime) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">deploy_id =</span> stringr<span class="sc">::</span><span class="fu">str_sub</span>(deploy_id, <span class="dv">1</span>,<span class="dv">11</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">do_union =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_cast</span>(<span class="st">"MULTILINESTRING"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, we can plot all of these additional lines along with our original predicted tracks. We can build on our previous plot and simply add another layer to plot the predicted tracks but at a slightly smaller size and with some alpha transparency.</p>
+<div class="cell" data-fig.asp="1">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>world <span class="ot">&lt;-</span> <span class="fu">ne_countries</span>(<span class="at">scale =</span> <span class="st">"medium"</span>,<span class="at">returnclass =</span> <span class="st">"sf"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_make_valid</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_transform</span>(akbs_epsg)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>map <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span> <span class="fu">geom_sf</span>(<span class="at">data =</span> world) <span class="sc">+</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> akbs_sims, <span class="fu">aes</span>(<span class="at">color =</span> deploy_id), <span class="at">alpha =</span> <span class="fl">0.1</span>, <span class="at">size=</span><span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> akbs_preds, <span class="fu">aes</span>(<span class="at">color =</span> deploy_id),</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">size =</span> <span class="fl">0.3</span>) <span class="sc">+</span> </span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>(</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">xlim =</span> sf<span class="sc">::</span><span class="fu">st_bbox</span>(akbs_sims)[<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)],</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylim =</span> sf<span class="sc">::</span><span class="fu">st_bbox</span>(akbs_sims)[<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">4</span>)]) <span class="sc">+</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_discrete_qualitative</span>(</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette =</span> <span class="st">"Dark 3"</span>,</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">"deployment"</span>) <span class="sc">+</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Predicted Movement of 6 Bearded Seals in NW Alaska"</span>,</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">"most likely path and imputed paths shown"</span>)) <span class="sc">+</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="crawl-utils_files/figure-html/imputed-plot-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+
+
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
