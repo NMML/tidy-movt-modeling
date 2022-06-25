@@ -22,6 +22,7 @@ library(pathroutr)
 library(dplyr)
 library(purrr)
 library(ggplot2)
+library(colorspace)
 library(sf)
 ```
 
