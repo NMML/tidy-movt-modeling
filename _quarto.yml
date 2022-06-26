@@ -37,6 +37,7 @@ website:
           - intro-to-pathroutr.qmd
           - land-polygon.qmd
           - pathroutr-demo.qmd
+          - pathroutr-demo2.qmd
           - pathroutr-cautions.qmd
 
 format:
