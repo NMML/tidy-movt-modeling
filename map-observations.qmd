@@ -52,8 +52,8 @@ top_crs %>%
  world basemap data from the `rnaturalearth` package.
  
 ```{r}
-#|: message: false
-#|: warning: false
+#| message: false
+#| warning: false
 #| fig-asp: 1
 #| fig-cap: Basic map of locations from bio-loggers deployed on six
 #|   bearded seals in northwest Alaska
