@@ -143,6 +143,167 @@ dir_ls(dir_out, recurse = TRUE, glob = "*.parquet") %>%
   path_rel(here::here("data"))
 ```
 
+## Is Arrow Really Faster
+
+Let's do a quick benchmark to see whether we save any significant time
+with this approach over simply reading in our original csv into memory.
+
+```{r}
+#| label: benchmark
+#| warning: false
+#| message: false
+library(microbenchmark)
+
+locs_csv <- readr::read_csv(path_to_file) %>% 
+  janitor::clean_names()
+locs_ds <- arrow::open_dataset(dir_out)
+
+microbenchmark::microbenchmark(
+  
+csv = locs_csv %>% 
+  mutate(
+    num_sats = case_when(
+      type == "FastGPS" ~ quality,
+      TRUE ~ NA_character_
+      ),
+    quality = case_when(
+      type == "FastGPS" ~ NA_character_,
+      TRUE ~ quality
+    ),
+    num_sats = as.integer(num_sats)
+    ) %>% 
+  filter (num_sats > 4 | is.na(num_sats)) %>% 
+  group_by(deploy_id) %>% 
+  summarise(
+    n_locs = n(),
+    start_dt = min(date),
+    max_dt = max(date)
+  )%>% 
+  arrange(deploy_id),
+
+dataset = locs_ds %>% 
+  mutate(
+    num_sats = case_when(
+      type == "FastGPS" ~ quality,
+      TRUE ~ NA_character_
+      ),
+    quality = case_when(
+      type == "FastGPS" ~ NA_character_,
+      TRUE ~ quality
+    ),
+    num_sats = as.integer(num_sats)
+    ) %>% 
+  filter (num_sats > 4 | is.na(num_sats)) %>% 
+  group_by(deploy_id) %>% 
+  summarise(
+    n_locs = n(),
+    start_dt = min(date),
+    max_dt = max(date)
+  ) %>% 
+  arrange(deploy_id) %>% 
+  collect()
+)
+
+```
+
+The answer is, actually, "no, we do not save any time". That's because our
+data set is relatively small at only n=`r nrow(locs_csv)`. But, what if instead
+of 6 animals, we had 60 animals with similar deployment lengths? To explore
+this, let's create a simulated data set that repeats each of our deployments
+40 times.
+
+```{r}
+#| include: false
+rm(locs_csv)
+rm(locs_ds)
+```
+
+
+```{r}
+tbl_locs_big <- list.files(file.path('~/Downloads/akbs_data'),
+                       recursive = TRUE, 
+                       full.names = TRUE, 
+                       pattern = "*-Locations.csv") %>% 
+  rep(10)
+
+tbl_locs_big <- tbl_locs_big %>% 
+  purrr::map_df( ~ readr::read_csv(.x, col_types = my_cols), .id="rep_id") %>% 
+  janitor::clean_names() %>% 
+  dplyr::mutate(deploy_id = paste0(deploy_id,rep_id)) %>% 
+  readr::write_csv(file = here::here('raw-data','akbs_locs_big.csv'))
+
+path_to_big_file <- here::here("raw-data","akbs_locs_big.csv")
+dir_out_big <- here::here("data","akbs_locs_big_parquet")
+
+if(fs::dir_exists(dir_out_big)) { fs::dir_delete(dir_out_big) }
+if(fs::dir_exists(dir_out_big)) { fs::dir_create(dir_out_big) }
+arrow::write_dataset(tbl_locs_big, dir_out_big, partitioning = "deploy_id")
+```
+
+
+```{r}
+#| label: benchmark-big
+#| warning: false
+#| message: false
+library(microbenchmark)
+
+locs_csv <- readr::read_csv(path_to_big_file) %>% 
+  janitor::clean_names()
+locs_ds <- arrow::open_dataset(dir_out_big)
+
+microbenchmark::microbenchmark(
+  
+csv = locs_csv %>% 
+  mutate(
+    num_sats = case_when(
+      type == "FastGPS" ~ quality,
+      TRUE ~ NA_character_
+      ),
+    quality = case_when(
+      type == "FastGPS" ~ NA_character_,
+      TRUE ~ quality
+    ),
+    num_sats = as.integer(num_sats)
+    ) %>% 
+  filter (num_sats > 4 | is.na(num_sats)) %>% 
+  group_by(deploy_id) %>% 
+  summarise(
+    n_locs = n(),
+    start_dt = min(date),
+    max_dt = max(date)
+  )%>% 
+  arrange(deploy_id),
+
+dataset = locs_ds %>% 
+  mutate(
+    num_sats = case_when(
+      type == "FastGPS" ~ quality,
+      TRUE ~ NA_character_
+      ),
+    quality = case_when(
+      type == "FastGPS" ~ NA_character_,
+      TRUE ~ quality
+    ),
+    num_sats = as.integer(num_sats)
+    ) %>% 
+  filter (num_sats > 4 | is.na(num_sats)) %>% 
+  group_by(deploy_id) %>% 
+  summarise(
+    n_locs = n(),
+    start_dt = min(date),
+    max_dt = max(date)
+  ) %>% 
+  arrange(deploy_id) %>% 
+  collect()
+)
+
+rm(locs_csv)
+rm(locs_ds)
+
+```
+
+So, with just a modest increase in the number of deployments, the `arrow`
+pipeline approach is almost 2x faster.
 
 ## Querying Our Data
 
